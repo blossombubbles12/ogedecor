@@ -1,7 +1,29 @@
+import { Metadata } from "next";
 import { getProjectById } from "@/app/actions";
 import { notFound } from "next/navigation";
 import { Calendar, Tag, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const { id } = await params;
+    const project = await getProjectById(id);
+
+    if (!project) {
+        return {
+            title: "Project Not Found",
+        };
+    }
+
+    return {
+        title: project.title,
+        description: project.description.substring(0, 160),
+        openGraph: {
+            title: `${project.title} | OgeDecor`,
+            description: project.description.substring(0, 160),
+            images: Array.isArray(project.media) ? [{ url: project.media[0]?.url }] : [],
+        },
+    };
+}
 
 export default async function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;

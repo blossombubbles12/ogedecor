@@ -15,8 +15,32 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "OgeDecor | African Luxury Interiors",
-  description: "Modern Afro-luxury interior design portfolio. Curating spaces that blend Wakanda-inspired luxury with futuristic minimalism.",
+  title: {
+    default: "OgeDecor | African Luxury Interiors",
+    template: "%s | OgeDecor"
+  },
+  description: "Modern Afro-luxury interior design portfolio. Curating spaces that blend Wakanda-inspired luxury with futuristic minimalism. Nigerian heritage meets contemporary elegance.",
+  keywords: ["interior design", "African luxury", "Afro-luxury", "modern interiors", "OgeDecor", "Lagos interior design", "luxury furniture", "African art", "minimalism"],
+  authors: [{ name: "OgeDecor" }],
+  creator: "OgeDecor",
+  metadataBase: new URL("https://ogedecor.com"), // Replace with actual domain when available
+  openGraph: {
+    type: "website",
+    locale: "en_NG",
+    url: "https://ogedecor.com",
+    title: "OgeDecor | African Luxury Interiors",
+    description: "Modern Afro-luxury interior design portfolio. Curating spaces that blend Wakanda-inspired luxury with futuristic minimalism.",
+    siteName: "OgeDecor",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OgeDecor | African Luxury Interiors",
+    description: "Modern Afro-luxury interior design portfolio. Curating spaces that blend Wakanda-inspired luxury with futuristic minimalism.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
