@@ -46,7 +46,7 @@ export default function FeaturedProjects() {
     ];
 
     return (
-        <section id="projects" className="py-24 bg-black/40">
+        <section id="projects" className="py-24 bg-strip-pattern">
             <div className="container mx-auto px-6">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16">
                     <div>

@@ -149,7 +149,7 @@ export default function ContactContent() {
                 </div>
             )}
 
-            <div className="flex-1 flex items-center justify-center p-6 pb-24 relative z-10">
+            <div className="flex-1 flex items-center justify-center p-6 pt-32 pb-24 relative z-10">
                 <div className="container mx-auto max-w-4xl">
                     <AnimatePresence mode="wait">
                         {currentStep === 0 && (

@@ -51,7 +51,7 @@ export default function ShopPreview() {
     }, []);
 
     return (
-        <section id="shop" className="py-24 bg-white/5 relative">
+        <section id="shop" className="py-24 bg-strip-pattern relative">
             <div className="container mx-auto px-6">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16">
                     <div>

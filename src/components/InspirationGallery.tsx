@@ -17,7 +17,7 @@ export default function InspirationGallery() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     return (
-        <section id="inspiration" className="py-24">
+        <section id="inspiration" className="py-24 bg-strip-pattern">
             <div className="container mx-auto px-6">
                 <div className="text-center mb-16">
                     <h3 className="text-gold tracking-[0.2em] text-sm uppercase mb-4">Moodboard</h3>
