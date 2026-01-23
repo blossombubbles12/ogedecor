@@ -49,7 +49,7 @@ export default function BrandStory() {
                     className="relative h-[600px] w-full bg-neutral-900 rounded-sm overflow-hidden"
                 >
                     {/* Abstract/Portrait Placeholder */}
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?q=80&w=1200&auto=format&fit=crop')] bg-cover bg-center opacity-80" />
+                    <div className="absolute inset-0 bg-[url('/philosophy-bg.png')] bg-cover bg-center opacity-80" />
                     <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-transparent" />
 
                     <div className="absolute bottom-8 left-8">

@@ -21,10 +21,10 @@ export default function Footer() {
                     <div>
                         <h4 className="text-sm font-semibold tracking-widest mb-6">EXPLORE</h4>
                         <ul className="space-y-4 text-sm text-white/60">
-                            <li><Link href="#projects" className="hover:text-gold transition-colors">Projects</Link></li>
-                            <li><Link href="#services" className="hover:text-gold transition-colors">Services</Link></li>
-                            <li><Link href="#shop" className="hover:text-gold transition-colors">Shop</Link></li>
-                            <li><Link href="#journal" className="hover:text-gold transition-colors">Journal</Link></li>
+                            <li><Link href="/about" className="hover:text-gold transition-colors">About Ogechi</Link></li>
+                            <li><Link href="/projects" className="hover:text-gold transition-colors">Portfolio</Link></li>
+                            <li><Link href="/services" className="hover:text-gold transition-colors">Services</Link></li>
+                            <li><Link href="/shop" className="hover:text-gold transition-colors">Collection</Link></li>
                         </ul>
                     </div>
 
