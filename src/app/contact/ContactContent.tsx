@@ -97,6 +97,27 @@ export default function ContactContent() {
         try {
             const result = await createInquiry(formData);
             if (result.success) {
+                // Format the WhatsApp message
+                const whatsappNumber = "2349068389852";
+                const message = `Hello OgeDecor! I'd like to start a project.
+
+*Project Details:*
+- *Name:* ${formData.name}
+- *Contact:* ${formData.email}
+- *Project Type:* ${formData.projectType}
+- *Atmosphere:* ${formData.mood}
+- *Timeline:* ${formData.timeline}
+- *Budget:* ${formData.budget}
+${formData.inspiration ? `- *Inspiration:* ${formData.inspiration.url}` : ""}
+
+I'm looking forward to discussing this project with you!`;
+
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+                // Redirect to WhatsApp in a new tab
+                window.open(whatsappUrl, "_blank");
+
                 nextStep();
             } else {
                 alert("Submission failed. Please try again.");
@@ -385,7 +406,7 @@ export default function ContactContent() {
                                     </div>
                                     <div className="relative">
                                         <input
-                                            type="email"
+                                            type="text"
                                             placeholder="Your Email or WhatsApp"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
