@@ -1,66 +1,18 @@
 "use server";
 
-import { sql } from "@/lib/db";
-import { v2 as cloudinary } from "cloudinary";
+import { getPayloadClient } from "@/lib/payload";
 import { revalidatePath } from "next/cache";
+import { v2 as cloudinary } from "cloudinary";
 
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// Helper to initialize the tables if they don't exist
-async function ensureTablesExist() {
-    try {
-        // Projects table
-        await sql`
-          CREATE TABLE IF NOT EXISTS projects (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
-            category TEXT NOT NULL,
-            completion_date TIMESTAMP WITH TIME ZONE NOT NULL,
-            media JSONB NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-          );
-        `;
-
-        // Inquiries table
-        await sql`
-          CREATE TABLE IF NOT EXISTS inquiries (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            project_type TEXT NOT NULL,
-            mood TEXT NOT NULL,
-            timeline TEXT NOT NULL,
-            budget TEXT NOT NULL,
-            inspiration JSONB,
-            contact_name TEXT NOT NULL,
-            contact_info TEXT NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-          );
-        `;
-
-        // Products table
-        await sql`
-          CREATE TABLE IF NOT EXISTS products (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            name TEXT NOT NULL,
-            price TEXT NOT NULL,
-            description TEXT,
-            category TEXT,
-            image TEXT NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-          );
-        `;
-    } catch (error) {
-        console.error("Error ensuring tables exist:", error);
-    }
+if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
+    cloudinary.config({
+        cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
 }
 
-// Generate Cloudinary signature for secure uploads
+// Generate Cloudinary signature for legacy direct uploads
 export async function getCloudinarySignature() {
     const timestamp = Math.round(new Date().getTime() / 1000);
     const folder = "ogedecor";
@@ -70,102 +22,128 @@ export async function getCloudinarySignature() {
             timestamp,
             folder,
         },
-        process.env.CLOUDINARY_API_SECRET!
+        process.env.CLOUDINARY_API_SECRET || ""
     );
 
     return { signature, timestamp, folder };
 }
 
-// Create a new project
+
+// Project creation via Payload Local API
 export async function createProject(data: {
     title: string;
     description: string;
     category: string;
-    completionDate: string;
-    media: Array<{ url: string; type: "image" | "video"; publicId: string }>;
+    completionDate?: string;
+    media?: Array<{ url: string; type?: "image" | "video"; publicId?: string }>;
 }) {
-    await ensureTablesExist();
     try {
-        const result = await sql`
-            INSERT INTO projects (title, description, category, completion_date, media)
-            VALUES (${data.title}, ${data.description}, ${data.category}, ${data.completionDate}, ${JSON.stringify(data.media)})
-            RETURNING *;
-        `;
+        const payload = await getPayloadClient();
+        const project = await payload.create({
+            collection: "projects",
+            data: {
+                title: data.title,
+                description: data.description,
+                category: (data.category as any) || "Residential",
+                completionDate: data.completionDate,
+                media: (data.media || []).map((m) => ({
+                    url: m.url,
+                    type: (m.type as any) || "image",
+                })),
+            },
+        });
 
         revalidatePath("/");
-        return { success: true, project: result[0] };
+        revalidatePath("/projects");
+        return { success: true, project };
     } catch (error) {
-        console.error("Error creating project with Neon SQL:", error);
+        console.error("Error creating project with Payload CMS:", error);
         return { success: false, error: "Failed to create project" };
     }
 }
 
-// Get all projects
+// Get all projects with fallback for pending DB credentials
 export async function getProjects() {
-    await ensureTablesExist();
     try {
-        const projects = await sql`
-            SELECT 
-              id, 
-              title, 
-              description, 
-              category, 
-              completion_date as "completionDate", 
-              media, 
-              created_at as "createdAt", 
-              updated_at as "updatedAt"
-            FROM projects 
-            ORDER BY created_at DESC;
-        `;
-        return projects;
+        const payload = await getPayloadClient();
+        const result = await payload.find({
+            collection: "projects",
+            sort: "-createdAt",
+            limit: 100,
+        });
+
+        if (!result.docs || result.docs.length === 0) {
+            return [];
+        }
+
+        return result.docs.map((doc: any) => ({
+            id: String(doc.id),
+            title: doc.title,
+            description: doc.description,
+            category: doc.category,
+            completionDate: doc.completionDate,
+            media: (doc.media || []).map((m: any) => ({
+                url: typeof m.image === "object" && m.image?.url ? m.image.url : m.url || "",
+                type: m.type || "image",
+            })),
+            createdAt: doc.createdAt,
+            updatedAt: doc.updatedAt,
+        }));
     } catch (error) {
-        console.error("Error fetching projects with Neon SQL:", error);
+        console.warn("Could not fetch projects via Payload CMS (DB credentials pending or connecting):", error);
         return [];
-    }
-}
-
-// Delete a project
-export async function deleteProject(id: string) {
-    await ensureTablesExist();
-    try {
-        await sql`
-            DELETE FROM projects 
-            WHERE id = ${id};
-        `;
-
-        revalidatePath("/");
-        return { success: true };
-    } catch (error) {
-        console.error("Error deleting project with Neon SQL:", error);
-        return { success: false, error: "Failed to delete project" };
     }
 }
 
 // Get project by ID
 export async function getProjectById(id: string) {
-    await ensureTablesExist();
     try {
-        const result = await sql`
-            SELECT 
-              id, 
-              title, 
-              description, 
-              category, 
-              completion_date as "completionDate", 
-              media, 
-              created_at as "createdAt", 
-              updated_at as "updatedAt"
-            FROM projects 
-            WHERE id = ${id};
-        `;
-        return result[0] || null;
+        const payload = await getPayloadClient();
+        const doc: any = await payload.findByID({
+            collection: "projects",
+            id,
+        });
+
+        if (!doc) return null;
+
+        return {
+            id: String(doc.id),
+            title: doc.title,
+            description: doc.description,
+            category: doc.category,
+            completionDate: doc.completionDate,
+            media: (doc.media || []).map((m: any) => ({
+                url: typeof m.image === "object" && m.image?.url ? m.image.url : m.url || "",
+                type: m.type || "image",
+            })),
+            createdAt: doc.createdAt,
+            updatedAt: doc.updatedAt,
+        };
     } catch (error) {
-        console.error("Error fetching project by ID:", error);
+        console.warn(`Could not fetch project [${id}] via Payload CMS:`, error);
         return null;
     }
 }
 
-// Create a project inquiry
+// Delete a project
+export async function deleteProject(id: string) {
+    try {
+        const payload = await getPayloadClient();
+        await payload.delete({
+            collection: "projects",
+            id,
+        });
+
+        revalidatePath("/");
+        revalidatePath("/projects");
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting project via Payload CMS:", error);
+        return { success: false, error: "Failed to delete project" };
+    }
+}
+
+// Create inquiry / design consultation request
 export async function createInquiry(data: {
     projectType: string;
     mood: string;
@@ -175,30 +153,53 @@ export async function createInquiry(data: {
     name: string;
     email: string;
 }) {
-    await ensureTablesExist();
     try {
-        const result = await sql`
-            INSERT INTO inquiries (project_type, mood, timeline, budget, inspiration, contact_name, contact_info)
-            VALUES (${data.projectType}, ${data.mood}, ${data.timeline}, ${data.budget}, ${JSON.stringify(data.inspiration)}, ${data.name}, ${data.email})
-            RETURNING *;
-        `;
-        return { success: true, inquiry: result[0] };
+        const payload = await getPayloadClient();
+        const inquiry = await payload.create({
+            collection: "inquiries",
+            data: {
+                contactName: data.name,
+                contactInfo: data.email,
+                projectType: data.projectType,
+                mood: data.mood,
+                timeline: data.timeline,
+                budget: data.budget,
+                inspiration: data.inspiration,
+                status: "new",
+            },
+        });
+        return { success: true, inquiry };
     } catch (error) {
-        console.error("Error creating inquiry:", error);
+        console.error("Error creating inquiry via Payload CMS:", error);
         return { success: false, error: "Failed to submit inquiry" };
     }
 }
 
-// Get all products
+// Get all shop products with fallback for pending DB credentials
 export async function getShopProducts() {
-    await ensureTablesExist();
     try {
-        const products = await sql`
-            SELECT * FROM products ORDER BY created_at DESC;
-        `;
-        return products;
+        const payload = await getPayloadClient();
+        const result = await payload.find({
+            collection: "products",
+            sort: "-createdAt",
+            limit: 100,
+        });
+
+        if (!result.docs || result.docs.length === 0) {
+            return [];
+        }
+
+        return result.docs.map((doc: any) => ({
+            id: String(doc.id),
+            name: doc.name,
+            price: doc.price,
+            description: doc.description,
+            category: doc.category,
+            image: typeof doc.imageMedia === "object" && doc.imageMedia?.url ? doc.imageMedia.url : doc.image || "",
+            createdAt: doc.createdAt,
+        }));
     } catch (error) {
-        console.error("Error fetching products:", error);
+        console.warn("Could not fetch shop products via Payload CMS (DB credentials pending or connecting):", error);
         return [];
     }
 }
@@ -207,22 +208,25 @@ export async function getShopProducts() {
 export async function createProduct(data: {
     name: string;
     price: string;
-    description: string;
-    category: string;
-    image: string;
+    description?: string;
+    category?: string;
+    image?: string;
 }) {
-    await ensureTablesExist();
     try {
-        const result = await sql`
-            INSERT INTO products (name, price, description, category, image)
-            VALUES (${data.name}, ${data.price}, ${data.description}, ${data.category}, ${data.image})
-            RETURNING *;
-        `;
-        return { success: true, product: result[0] };
+        const payload = await getPayloadClient();
+        const product = await payload.create({
+            collection: "products",
+            data: {
+                name: data.name,
+                price: data.price,
+                description: data.description || "",
+                category: (data.category as any) || "Furniture",
+                image: data.image || "",
+            },
+        });
+        return { success: true, product };
     } catch (error) {
-        console.error("Error creating product:", error);
+        console.error("Error creating product via Payload CMS:", error);
         return { success: false, error: "Failed to create product" };
     }
 }
-
-

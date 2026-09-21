@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OgeDecor — Luxury Interior Design & E-Commerce
+
+A modern, high-performance interior design and ecommerce website for OgeDecor, built with **Next.js 16**, **Payload CMS 3.x**, **Neon PostgreSQL**, and **Vercel Blob** storage.
+
+---
+
+## Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
+- **CMS / Headless Backend**: [Payload CMS 3.x](https://payloadcms.com/)
+- **Database**: [Neon PostgreSQL](https://neon.tech/) via `@payloadcms/db-postgres`
+- **Media & Image Storage**: [Vercel Blob](https://vercel.com/storage/blob) via `@payloadcms/storage-vercel-blob`
+- **Styling**: Tailwind CSS, Framer Motion
+- **Package Manager**: [pnpm](https://pnpm.io/)
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install Dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file based on `.env.example`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# Neon PostgreSQL Connection
+DATABASE_URI="postgresql://username:password@ep-sample.us-east-2.aws.neon.tech/neondb?sslmode=require"
+DATABASE_URL="${DATABASE_URI}"
 
-## Learn More
+# Vercel Blob Storage Token
+BLOB_READ_WRITE_TOKEN="vercel_blob_rw_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-To learn more about Next.js, take a look at the following resources:
+# Payload CMS Secret Key
+PAYLOAD_SECRET="your-secure-random-secret-key"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Server URL
+NEXT_PUBLIC_SERVER_URL="http://localhost:3000"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Run Development Server
 
-## Deploy on Vercel
+```bash
+pnpm dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Payload CMS Admin**: [http://localhost:3000/admin](http://localhost:3000/admin)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## CMS Collections
+
+- **Users**: Admin authentication and permissions.
+- **Projects**: Portfolio showcase for residential, commercial, and custom decor projects.
+- **Products**: E-commerce catalog for furniture, lighting, art, and textiles.
+- **Inquiries**: Design consultation requests and lead management.
+- **Media**: Image and video uploads automatically stored in Vercel Blob with responsive thumbnail generation.
+
+---
+
+## Deployment on Vercel
+
+1. Push your changes to GitHub.
+2. Import the project in Vercel.
+3. In Vercel Project Settings > **Environment Variables**, add:
+   - `DATABASE_URI` (from Neon Console)
+   - `BLOB_READ_WRITE_TOKEN` (from Vercel Storage > Blob)
+   - `PAYLOAD_SECRET` (random 32+ character string)
+   - `NEXT_PUBLIC_SERVER_URL` (your production Vercel domain)
+4. Deploy!
