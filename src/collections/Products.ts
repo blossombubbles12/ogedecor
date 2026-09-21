@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
+    group: 'Atelier Commerce',
     useAsTitle: 'name',
     defaultColumns: ['name', 'category', 'price', 'stockQuantity', 'inStock', 'createdAt'],
   },

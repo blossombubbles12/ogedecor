@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 export const Projects: CollectionConfig = {
   slug: 'projects',
   admin: {
+    group: 'Studio & Portfolio',
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'completionDate', 'createdAt'],
   },

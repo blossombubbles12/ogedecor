@@ -1,0 +1,181 @@
+/* ==========================================================================
+   OGEDECOR ATELIER CMS — BESPOKE HAUTE-COUTURE LUXURY ADMIN DESIGN SYSTEM
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Haute-Couture Gold & Obsidian Palette */
+  --gold-primary: #D4AF37;
+  --gold-light: #F4E8C1;
+  --gold-dark: #AA820A;
+  --gold-glow: rgba(212, 175, 55, 0.25);
+
+  --obsidian-950: #09090B;
+  --obsidian-900: #0F0F12;
+  --obsidian-850: #141418;
+  --obsidian-800: #1B1B22;
+  --obsidian-border: rgba(212, 175, 55, 0.16);
+
+  /* Override Payload CMS Core Tokens */
+  --theme-bg: var(--obsidian-950);
+  --theme-elevation-0: var(--obsidian-950);
+  --theme-elevation-50: var(--obsidian-900);
+  --theme-elevation-100: var(--obsidian-850);
+  --theme-elevation-150: var(--obsidian-800);
+  --theme-elevation-200: #24242D;
+  --theme-elevation-250: #2E2E3A;
+
+  --theme-text: #F4F4F5;
+  --theme-text-accent: #D4AF37;
+}
+
+/* Typography Overrides */
+body, 
+.template-default,
+.app-header,
+.nav {
+  font-family: var(--font-sans) !important;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, .collection-list__title, .dashboard__title {
+  font-family: var(--font-serif) !important;
+  letter-spacing: 0.03em !important;
+  color: var(--gold-light) !important;
+}
+
+/* Haute-Couture Navigation & Sidebar */
+.nav {
+  background: linear-gradient(180deg, #09090B 0%, #111115 100%) !important;
+  border-right: 1px solid var(--obsidian-border) !important;
+}
+
+.nav__group-label {
+  font-family: var(--font-sans) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2em !important;
+  color: #D4AF37 !important;
+  text-transform: uppercase !important;
+  padding: 16px 12px 6px 12px !important;
+  opacity: 0.9;
+}
+
+.nav__link {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  margin: 2px 8px !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.nav__link:hover {
+  background: rgba(212, 175, 55, 0.08) !important;
+  color: #F4E8C1 !important;
+  transform: translateX(3px);
+}
+
+.nav__link--active {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0.05) 100%) !important;
+  color: #D4AF37 !important;
+  border-left: 2px solid #D4AF37 !important;
+  font-weight: 600 !important;
+}
+
+/* Top Header Bar */
+.app-header {
+  background: rgba(9, 9, 11, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid var(--obsidian-border) !important;
+}
+
+/* Card & Surface Elevations */
+.card,
+.collection-card,
+.table {
+  background: var(--obsidian-900) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 12px !important;
+  transition: all 0.25s ease !important;
+}
+
+.card:hover,
+.collection-card:hover {
+  border-color: rgba(212, 175, 55, 0.35) !important;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7), 0 0 15px rgba(212, 175, 55, 0.08) !important;
+  transform: translateY(-2px);
+}
+
+/* Primary Luxury Buttons */
+.btn--style-primary {
+  background: linear-gradient(180deg, #D4AF37 0%, #AA820A 100%) !important;
+  color: #09090B !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3) !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn--style-primary:hover {
+  background: linear-gradient(180deg, #E5C478 0%, #BC931D 100%) !important;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45) !important;
+  transform: translateY(-1px);
+}
+
+.btn--style-secondary {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(212, 175, 55, 0.25) !important;
+  color: #E4E4E7 !important;
+  border-radius: 8px !important;
+}
+
+.btn--style-secondary:hover {
+  background: rgba(212, 175, 55, 0.1) !important;
+  border-color: #D4AF37 !important;
+  color: #F4E8C1 !important;
+}
+
+/* Table Design Overhaul */
+.table thead th {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: #D4AF37 !important;
+  background: var(--obsidian-950) !important;
+  border-bottom: 1px solid var(--obsidian-border) !important;
+}
+
+.table tbody tr {
+  transition: background-color 0.15s ease !important;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(212, 175, 55, 0.03) !important;
+}
+
+/* Refined Minimalist Luxury Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272A;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}

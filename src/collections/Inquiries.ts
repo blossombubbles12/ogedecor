@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 export const Inquiries: CollectionConfig = {
   slug: 'inquiries',
   admin: {
+    group: 'Client Concierge',
     useAsTitle: 'contactName',
     defaultColumns: ['contactName', 'contactInfo', 'projectType', 'budget', 'status', 'createdAt'],
   },

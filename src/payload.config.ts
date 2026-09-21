@@ -27,6 +27,20 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: ' | OgeDecor Atelier CMS',
+      icons: [{ url: '/ogedecoricon.png' }],
+      openGraph: {
+        images: ['/ogedecor.png'],
+      },
+    },
+    components: {
+      graphics: {
+        Logo: '/components/admin/Logo#Logo',
+        Icon: '/components/admin/Icon#Icon',
+      },
+      beforeDashboard: ['/components/admin/BeforeDashboard#BeforeDashboard'],
+    },
   },
   collections: [Users, Media, Projects, Products, DeliveryMethods, Orders, Inquiries],
   editor: lexicalEditor(),
