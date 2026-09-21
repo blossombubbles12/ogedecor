@@ -282,8 +282,8 @@ export async function getDeliveryMethods() {
         },
         {
             id: "del-pickup",
-            title: "Showroom & Atelier Pickup",
-            description: "Complimentary pickup from our Victoria Island flagship atelier.",
+            title: "Showroom Flagship Pickup",
+            description: "Complimentary pickup from our Victoria Island flagship showroom.",
             price: 0,
             currency: "USD",
             estimatedDays: "Ready in 24 hours",

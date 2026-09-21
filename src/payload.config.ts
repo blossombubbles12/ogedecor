@@ -23,12 +23,13 @@ const blobToken = rawBlobToken.trim().replace(/^["']|["']$/g, '')
 export default buildConfig({
   sharp,
   admin: {
+    theme: 'all',
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
     },
     meta: {
-      titleSuffix: ' | OgeDecor Atelier CMS',
+      titleSuffix: ' | Ogedecor CMS',
       icons: [{ url: '/ogedecoricon.png' }],
       openGraph: {
         images: ['/ogedecor.png'],
@@ -39,6 +40,7 @@ export default buildConfig({
         Logo: '/components/admin/Logo#Logo',
         Icon: '/components/admin/Icon#Icon',
       },
+      beforeNavLinks: ['/components/admin/DashboardNavLink#DashboardNavLink'],
       beforeDashboard: ['/components/admin/BeforeDashboard#BeforeDashboard'],
     },
   },

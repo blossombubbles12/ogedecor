@@ -135,7 +135,7 @@ export default function CheckoutModal({
                     <div className="p-6 border-b border-white/10 flex items-center justify-between bg-black/40">
                         <div>
                             <span className="text-[10px] tracking-[0.3em] font-medium uppercase text-gold">
-                                OgeDecor Atelier
+                                Ogedecor
                             </span>
                             <h2 className="font-serif text-2xl text-sand mt-0.5">
                                 {step === "details" ? "Secure Checkout & White-Glove Logistics" : "Order Confirmed"}
@@ -314,7 +314,7 @@ export default function CheckoutModal({
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     {[
-                                        { id: "bank_transfer", label: "Bank Transfer / Wire", desc: "Direct atelier wire invoice" },
+                                        { id: "bank_transfer", label: "Bank Transfer / Wire", desc: "Direct bank wire invoice" },
                                         { id: "card", label: "Online Card / Paystack", desc: "Instant debit/credit authorization" },
                                         { id: "pos_showroom", label: "Showroom / COD", desc: "Pay upon white-glove inspection" },
                                     ].map((opt) => (
@@ -398,7 +398,7 @@ export default function CheckoutModal({
                                 </span>
                                 <h3 className="font-serif text-3xl text-sand mt-1">Thank You, {confirmedOrder?.customerName}</h3>
                                 <p className="text-white/60 text-sm max-w-md mx-auto mt-2">
-                                    Your interior design pieces are now reserved in our atelier queue. A confirmation email has been dispatched to <span className="text-sand font-medium">{confirmedOrder?.customerEmail}</span>.
+                                    Your interior design pieces are now reserved in our order queue. A confirmation email has been dispatched to <span className="text-sand font-medium">{confirmedOrder?.customerEmail}</span>.
                                 </p>
                             </div>
 
@@ -434,7 +434,7 @@ export default function CheckoutModal({
                                     onClick={onClose}
                                     className="px-8 py-3.5 bg-gold text-obsidian font-medium tracking-wider uppercase text-xs rounded-xl hover:bg-gold-light transition-all"
                                 >
-                                    Continue Exploring Atelier
+                                    Continue Exploring Ogedecor
                                 </button>
                             </div>
                         </div>

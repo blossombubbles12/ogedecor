@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 export const Orders: CollectionConfig = {
   slug: 'orders',
   admin: {
-    group: 'Atelier Commerce',
+    group: 'Store & Commerce',
     useAsTitle: 'orderNumber',
     defaultColumns: ['orderNumber', 'customerName', 'grandTotal', 'deliveryStatus', 'paymentStatus', 'createdAt'],
   },
@@ -242,7 +242,7 @@ export const Orders: CollectionConfig = {
     {
       name: 'adminNotes',
       type: 'textarea',
-      label: 'Internal Admin / Atelier Notes',
+      label: 'Internal Admin Notes',
     },
   ],
 }

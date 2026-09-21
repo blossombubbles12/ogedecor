@@ -18,29 +18,30 @@ export const Logo: React.FC = () => {
       />
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <span
+          className="ogedecor-logo-title"
           style={{
             fontFamily: 'serif',
-            fontSize: '17px',
+            fontSize: '18px',
             fontWeight: 700,
-            letterSpacing: '0.18em',
-            color: '#F4E8C1',
+            letterSpacing: '0.14em',
             textTransform: 'uppercase',
             lineHeight: 1.1,
           }}
         >
-          OgeDecor
+          Ogedecor
         </span>
         <span
+          className="ogedecor-logo-subtitle"
           style={{
-            fontSize: '9px',
-            fontWeight: 500,
-            letterSpacing: '0.24em',
+            fontSize: '10px',
+            fontWeight: 600,
+            letterSpacing: '0.22em',
             color: '#D4AF37',
             textTransform: 'uppercase',
-            opacity: 0.85,
+            opacity: 0.9,
           }}
         >
-          Atelier CMS
+          Management CMS
         </span>
       </div>
     </div>

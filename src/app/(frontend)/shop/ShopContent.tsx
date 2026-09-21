@@ -230,7 +230,7 @@ export default function ShopContent() {
                             <Check size={12} />
                         </div>
                         <span className="text-xs font-serif">
-                            <strong className="text-gold">{addedToast}</strong> added to atelier bag.
+                            <strong className="text-gold">{addedToast}</strong> added to shopping bag.
                         </span>
                         <button
                             onClick={() => setIsCartOpen(true)}
@@ -251,7 +251,7 @@ export default function ShopContent() {
                             animate={{ opacity: 1, x: 0 }}
                             className="text-gold tracking-[0.3em] font-medium uppercase text-xs mb-3 flex items-center justify-center md:justify-start gap-2"
                         >
-                            <Sparkles size={14} /> The Oge Atelier Collection
+                            <Sparkles size={14} /> The Ogedecor Collection
                         </motion.h3>
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
@@ -498,7 +498,7 @@ export default function ShopContent() {
                                     className="flex-1 py-4 bg-gold text-obsidian font-bold tracking-wider uppercase text-xs rounded-xl hover:bg-gold-light transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
                                 >
                                     <ShoppingBag size={16} />
-                                    Add Piece to Atelier Bag
+                                    Add Piece to Bag
                                 </button>
                             </div>
                         </motion.div>

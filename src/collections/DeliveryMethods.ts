@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 export const DeliveryMethods: CollectionConfig = {
   slug: 'delivery-methods',
   admin: {
-    group: 'Atelier Commerce',
+    group: 'Store & Commerce',
     useAsTitle: 'title',
     defaultColumns: ['title', 'price', 'estimatedDays', 'isActive', 'createdAt'],
   },

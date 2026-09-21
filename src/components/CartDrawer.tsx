@@ -64,7 +64,7 @@ export default function CartDrawer({
                             <div className="flex items-center gap-3">
                                 <ShoppingBag className="text-gold" size={20} />
                                 <h3 className="font-serif text-xl text-sand tracking-wide">
-                                    Your Atelier Bag ({items.reduce((s, i) => s + i.quantity, 0)})
+                                    Your Shopping Bag ({items.reduce((s, i) => s + i.quantity, 0)})
                                 </h3>
                             </div>
                             <button
