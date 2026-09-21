@@ -9,11 +9,122 @@ import CheckoutModal from "@/components/CheckoutModal";
 
 const CATEGORIES = ["All", "Furniture", "Lighting", "Art & Decor", "Textiles", "Architectural Decor"];
 
-export default function ShopContent() {
-    const [products, setProducts] = useState<any[]>([]);
-    const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+const FALLBACK_PRODUCTS = [
+    {
+        id: "p1",
+        name: "Ashanti Stool - Gold Edition",
+        subtitle: "Handcrafted Solid Mahogany with 24k Gold Leaf",
+        price: 450,
+        formattedPrice: "$450.00",
+        currency: "USD",
+        category: "Furniture",
+        sku: "OGE-FURN-001",
+        stockQuantity: 8,
+        inStock: true,
+        materials: "Solid Mahogany, 24k Gold Leaf Trim, Natural Wax Finish",
+        dimensions: { height: "45 cm", width: "55 cm", depth: "35 cm", weight: "9 kg" },
+        deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: false, whiteGloveRequired: true },
+        image: "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=1200",
+        description: "Handcrafted with sustainable mahogany and finished with antique gold leaf, inspired by royal ceremonial seats."
+    },
+    {
+        id: "p2",
+        name: "Wakandan Geometry Vase",
+        subtitle: "Hand-Thrown Ceramic with West African Relief",
+        price: 180,
+        formattedPrice: "$180.00",
+        currency: "USD",
+        category: "Art & Decor",
+        sku: "OGE-ART-002",
+        stockQuantity: 14,
+        inStock: true,
+        materials: "High-Fire Terracotta Clay, Matte Basalt Glaze",
+        dimensions: { height: "38 cm", width: "22 cm", depth: "22 cm", weight: "4.5 kg" },
+        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: true, whiteGloveRequired: false },
+        image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?q=80&w=1200",
+        description: "Modern ceramic vase featuring intricate relief carvings inspired by West African geometric symbology."
+    },
+    {
+        id: "p3",
+        name: "Savanna Velvet Cushion",
+        subtitle: "Embroidered Architectural Silk-Velvet",
+        price: 95,
+        formattedPrice: "$95.00",
+        currency: "USD",
+        category: "Textiles",
+        sku: "OGE-TEXT-003",
+        stockQuantity: 25,
+        inStock: true,
+        materials: "100% Silk Velvet, Goose Down Insert, Metallic Embroidery",
+        dimensions: { height: "50 cm", width: "50 cm", depth: "15 cm", weight: "1.2 kg" },
+        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: false, whiteGloveRequired: false },
+        image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=1200",
+        description: "Bespoke decorative cushion crafted from rich architectural silk-velvet with metallic thread accents."
+    },
+    {
+        id: "p4",
+        name: "Kalahari Onyx Sconce",
+        subtitle: "Translucent African Onyx with Solid Brass Backplate",
+        price: 340,
+        formattedPrice: "$340.00",
+        currency: "USD",
+        category: "Lighting",
+        sku: "OGE-LIGHT-004",
+        stockQuantity: 6,
+        inStock: true,
+        materials: "Honed Kalahari Onyx, Unlacquered Brushed Brass, LED Module",
+        dimensions: { height: "35 cm", width: "15 cm", depth: "12 cm", weight: "3.8 kg" },
+        deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: true, whiteGloveRequired: false },
+        image: "https://images.unsplash.com/photo-1507473885765-e6ed60516b12?q=80&w=1200",
+        description: "Natural onyx stone cylinder providing a warm, diffused crystalline glow for atmospheric spaces."
+    },
+    {
+        id: "p5",
+        name: "Terracotta Relief Mask",
+        subtitle: "Sculptural Gallery Wall Accent",
+        price: 210,
+        formattedPrice: "$210.00",
+        currency: "USD",
+        category: "Art & Decor",
+        sku: "OGE-ART-005",
+        stockQuantity: 10,
+        inStock: true,
+        materials: "Aged Terracotta, Smoked Charcoal Pigment",
+        dimensions: { height: "60 cm", width: "28 cm", depth: "12 cm", weight: "5 kg" },
+        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: true, whiteGloveRequired: false },
+        image: "https://images.unsplash.com/photo-1513519245088-0e12902e15ca?q=80&w=1200",
+        description: "Contemporary interpretation of classical terracotta masks, mounted with concealed brass suspension."
+    },
+    {
+        id: "p6",
+        name: "Baobab Root Sculptural Table",
+        subtitle: "Reclaimed Aged Timber with Volcanic Wax",
+        price: 890,
+        formattedPrice: "$890.00",
+        currency: "USD",
+        category: "Furniture",
+        sku: "OGE-FURN-006",
+        stockQuantity: 3,
+        inStock: true,
+        materials: "Reclaimed Baobab Wood, Volcanic Obsidian Wax Treatment",
+        dimensions: { height: "52 cm", width: "65 cm", depth: "60 cm", weight: "22 kg" },
+        deliveryInfo: { leadTime: "White-glove scheduled delivery within 5 days", isFragile: false, whiteGloveRequired: true },
+        image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1200",
+        description: "One-of-a-kind sculptural accent table carved from preserved aged timber, celebrating natural organic forms."
+    },
+];
+
+interface ShopContentProps {
+    initialProducts?: any[];
+}
+
+export default function ShopContent({ initialProducts = [] }: ShopContentProps) {
+    const hasInitial = initialProducts && initialProducts.length > 0;
+    const initialList = hasInitial ? initialProducts : FALLBACK_PRODUCTS;
+    const [products, setProducts] = useState<any[]>(initialList);
+    const [filteredProducts, setFilteredProducts] = useState<any[]>(initialList);
     const [activeCategory, setActiveCategory] = useState("All");
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!hasInitial);
     
     // Cart and Checkout state
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -46,122 +157,23 @@ export default function ShopContent() {
     }, [cartItems]);
 
     useEffect(() => {
-        async function fetchProducts() {
-            setLoading(true);
-            const data = await getShopProducts();
-            
-            // Use luxury fallback items if database is freshly initialized
-            const initialData = data.length > 0 ? data : [
-                {
-                    id: "p1",
-                    name: "Ashanti Stool - Gold Edition",
-                    subtitle: "Handcrafted Solid Mahogany with 24k Gold Leaf",
-                    price: 450,
-                    formattedPrice: "$450.00",
-                    currency: "USD",
-                    category: "Furniture",
-                    sku: "OGE-FURN-001",
-                    stockQuantity: 8,
-                    inStock: true,
-                    materials: "Solid Mahogany, 24k Gold Leaf Trim, Natural Wax Finish",
-                    dimensions: { height: "45 cm", width: "55 cm", depth: "35 cm", weight: "9 kg" },
-                    deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: false, whiteGloveRequired: true },
-                    image: "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=1200",
-                    description: "Handcrafted with sustainable mahogany and finished with antique gold leaf, inspired by royal ceremonial seats."
-                },
-                {
-                    id: "p2",
-                    name: "Wakandan Geometry Vase",
-                    subtitle: "Hand-Thrown Ceramic with West African Relief",
-                    price: 180,
-                    formattedPrice: "$180.00",
-                    currency: "USD",
-                    category: "Art & Decor",
-                    sku: "OGE-ART-002",
-                    stockQuantity: 14,
-                    inStock: true,
-                    materials: "High-Fire Terracotta Clay, Matte Basalt Glaze",
-                    dimensions: { height: "38 cm", width: "22 cm", depth: "22 cm", weight: "4.5 kg" },
-                    deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: true, whiteGloveRequired: false },
-                    image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?q=80&w=1200",
-                    description: "Modern ceramic vase featuring intricate relief carvings inspired by West African geometric symbology."
-                },
-                {
-                    id: "p3",
-                    name: "Savanna Velvet Cushion",
-                    subtitle: "Embroidered Architectural Silk-Velvet",
-                    price: 95,
-                    formattedPrice: "$95.00",
-                    currency: "USD",
-                    category: "Textiles",
-                    sku: "OGE-TEXT-003",
-                    stockQuantity: 25,
-                    inStock: true,
-                    materials: "100% Silk Velvet, Goose Down Insert, Metallic Embroidery",
-                    dimensions: { height: "50 cm", width: "50 cm", depth: "15 cm", weight: "1.2 kg" },
-                    deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: false, whiteGloveRequired: false },
-                    image: "https://images.unsplash.com/photo-1584100936555-5c911b6d0590?q=80&w=1200",
-                    description: "Ultra-soft velvet with hand-embroidered patterns reflecting the vast savanna horizon at dusk."
-                },
-                {
-                    id: "p4",
-                    name: "Onyx Pillar Lamp",
-                    subtitle: "Hand-Carved Calcite Onyx with Brushed Brass",
-                    price: 320,
-                    formattedPrice: "$320.00",
-                    currency: "USD",
-                    category: "Lighting",
-                    sku: "OGE-LITE-004",
-                    stockQuantity: 6,
-                    inStock: true,
-                    materials: "Natural Calcite Onyx, Solid Brushed Brass, Dimmable LED Core",
-                    dimensions: { height: "42 cm", width: "16 cm", depth: "16 cm", weight: "8 kg" },
-                    deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: true, whiteGloveRequired: false },
-                    image: "https://images.unsplash.com/photo-1507473885765-e6ed60516b12?q=80&w=1200",
-                    description: "Natural onyx stone cylinder providing a warm, diffused crystalline glow for atmospheric spaces."
-                },
-                {
-                    id: "p5",
-                    name: "Terracotta Relief Mask",
-                    subtitle: "Sculptural Gallery Wall Accent",
-                    price: 210,
-                    formattedPrice: "$210.00",
-                    currency: "USD",
-                    category: "Art & Decor",
-                    sku: "OGE-ART-005",
-                    stockQuantity: 10,
-                    inStock: true,
-                    materials: "Aged Terracotta, Smoked Charcoal Pigment",
-                    dimensions: { height: "60 cm", width: "28 cm", depth: "12 cm", weight: "5 kg" },
-                    deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: true, whiteGloveRequired: false },
-                    image: "https://images.unsplash.com/photo-1513519245088-0e12902e15ca?q=80&w=1200",
-                    description: "Contemporary interpretation of classical terracotta masks, mounted with concealed brass suspension."
-                },
-                {
-                    id: "p6",
-                    name: "Baobab Root Sculptural Table",
-                    subtitle: "Reclaimed Aged Timber with Volcanic Wax",
-                    price: 890,
-                    formattedPrice: "$890.00",
-                    currency: "USD",
-                    category: "Furniture",
-                    sku: "OGE-FURN-006",
-                    stockQuantity: 3,
-                    inStock: true,
-                    materials: "Reclaimed Baobab Wood, Volcanic Obsidian Wax Treatment",
-                    dimensions: { height: "52 cm", width: "65 cm", depth: "60 cm", weight: "22 kg" },
-                    deliveryInfo: { leadTime: "White-glove scheduled delivery within 5 days", isFragile: false, whiteGloveRequired: true },
-                    image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1200",
-                    description: "One-of-a-kind sculptural accent table carved from preserved aged timber, celebrating natural organic forms."
-                },
-            ];
-
-            setProducts(initialData);
-            setFilteredProducts(initialData);
-            setLoading(false);
+        if (!hasInitial) {
+            async function fetchProducts() {
+                try {
+                    const data = await getShopProducts();
+                    if (data && data.length > 0) {
+                        setProducts(data);
+                        setFilteredProducts(data);
+                    }
+                } catch (e) {
+                    console.warn("Could not fetch products from backend", e);
+                } finally {
+                    setLoading(false);
+                }
+            }
+            fetchProducts();
         }
-        fetchProducts();
-    }, []);
+    }, [hasInitial]);
 
     useEffect(() => {
         if (activeCategory === "All") {

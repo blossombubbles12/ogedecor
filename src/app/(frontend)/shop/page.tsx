@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import ShopContent from "./ShopContent";
+import { getShopProducts } from "@/app/actions";
 
 export const metadata: Metadata = {
     title: "Shop | Bespoke African Decor",
@@ -7,6 +8,10 @@ export const metadata: Metadata = {
     keywords: ["luxury furniture", "African decor", "handmade furniture", "bespoke design", "OgeDecor shop"],
 };
 
-export default function ShopPage() {
-    return <ShopContent />;
+export const dynamic = "force-dynamic";
+
+export default async function ShopPage() {
+    const initialProducts = await getShopProducts();
+    return <ShopContent initialProducts={initialProducts} />;
 }
+
