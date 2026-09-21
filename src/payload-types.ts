@@ -71,6 +71,8 @@ export interface Config {
     media: Media;
     projects: Project;
     products: Product;
+    'delivery-methods': DeliveryMethod;
+    orders: Order;
     inquiries: Inquiry;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -83,6 +85,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    'delivery-methods': DeliveryMethodsSelect<false> | DeliveryMethodsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -229,17 +233,109 @@ export interface Project {
 export interface Product {
   id: number;
   name: string;
-  /**
-   * Formatted price (e.g. $450.00)
-   */
-  price: string;
+  slug?: string | null;
+  subtitle?: string | null;
   description?: string | null;
-  category?: ('Furniture' | 'Lighting' | 'Art & Decor' | 'Textiles') | null;
+  category: 'Furniture' | 'Lighting' | 'Art & Decor' | 'Textiles' | 'Architectural Decor';
+  price: number;
+  currency?: ('USD' | 'NGN' | 'EUR' | 'GBP') | null;
+  compareAtPrice?: number | null;
+  sku?: string | null;
+  stockQuantity?: number | null;
+  inStock?: boolean | null;
+  materials?: string | null;
+  dimensions?: {
+    height?: string | null;
+    width?: string | null;
+    depth?: string | null;
+    weight?: string | null;
+  };
+  deliveryInfo?: {
+    leadTime?: string | null;
+    isFragile?: boolean | null;
+    whiteGloveRequired?: boolean | null;
+  };
   imageMedia?: (number | null) | Media;
+  gallery?:
+    | {
+        image?: (number | null) | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
-   * Direct image URL fallback (e.g. Unsplash or external)
+   * External image link (e.g. Unsplash or Cloudinary) used if no file is uploaded
    */
   image?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "delivery-methods".
+ */
+export interface DeliveryMethod {
+  id: number;
+  title: string;
+  description?: string | null;
+  price: number;
+  currency: 'USD' | 'NGN' | 'EUR' | 'GBP';
+  estimatedDays: string;
+  regions?: ('Lagos Metro' | 'Abuja FCT' | 'South-West' | 'Nationwide' | 'West Africa' | 'International')[] | null;
+  /**
+   * Orders with a subtotal equal or above this amount get free delivery with this option.
+   */
+  freeShippingThreshold?: number | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  shippingAddress: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode?: string | null;
+    country: string;
+  };
+  items: {
+    product?: (number | null) | Product;
+    name: string;
+    price: number;
+    quantity: number;
+    lineTotal: number;
+    imageUrl?: string | null;
+    id?: string | null;
+  }[];
+  delivery?: {
+    method?: (number | null) | DeliveryMethod;
+    methodTitle?: string | null;
+    deliveryFee?: number | null;
+    deliveryStatus?:
+      ('pending' | 'crafting' | 'inspection' | 'dispatched' | 'out_for_delivery' | 'delivered' | 'cancelled') | null;
+    carrier?: string | null;
+    trackingNumber?: string | null;
+    specialInstructions?: string | null;
+  };
+  financials: {
+    subtotal: number;
+    deliveryTotal: number;
+    discountTotal?: number | null;
+    grandTotal: number;
+    currency: 'USD' | 'NGN' | 'EUR' | 'GBP';
+    paymentStatus?: ('pending' | 'paid' | 'on_delivery' | 'refunded') | null;
+    paymentMethod?: ('bank_transfer' | 'card' | 'pos_showroom') | null;
+  };
+  adminNotes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -307,6 +403,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'delivery-methods';
+        value: number | DeliveryMethod;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
       } | null)
     | ({
         relationTo: 'inquiries';
@@ -459,11 +563,112 @@ export interface ProjectsSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   name?: T;
-  price?: T;
+  slug?: T;
+  subtitle?: T;
   description?: T;
   category?: T;
+  price?: T;
+  currency?: T;
+  compareAtPrice?: T;
+  sku?: T;
+  stockQuantity?: T;
+  inStock?: T;
+  materials?: T;
+  dimensions?:
+    | T
+    | {
+        height?: T;
+        width?: T;
+        depth?: T;
+        weight?: T;
+      };
+  deliveryInfo?:
+    | T
+    | {
+        leadTime?: T;
+        isFragile?: T;
+        whiteGloveRequired?: T;
+      };
   imageMedia?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
   image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "delivery-methods_select".
+ */
+export interface DeliveryMethodsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  price?: T;
+  currency?: T;
+  estimatedDays?: T;
+  regions?: T;
+  freeShippingThreshold?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
+  customerName?: T;
+  customerEmail?: T;
+  customerPhone?: T;
+  shippingAddress?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+        country?: T;
+      };
+  items?:
+    | T
+    | {
+        product?: T;
+        name?: T;
+        price?: T;
+        quantity?: T;
+        lineTotal?: T;
+        imageUrl?: T;
+        id?: T;
+      };
+  delivery?:
+    | T
+    | {
+        method?: T;
+        methodTitle?: T;
+        deliveryFee?: T;
+        deliveryStatus?: T;
+        carrier?: T;
+        trackingNumber?: T;
+        specialInstructions?: T;
+      };
+  financials?:
+    | T
+    | {
+        subtotal?: T;
+        deliveryTotal?: T;
+        discountTotal?: T;
+        grandTotal?: T;
+        currency?: T;
+        paymentStatus?: T;
+        paymentMethod?: T;
+      };
+  adminNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }

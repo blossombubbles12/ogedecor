@@ -11,6 +11,8 @@ import { Media } from './collections/Media'
 import { Projects } from './collections/Projects'
 import { Products } from './collections/Products'
 import { Inquiries } from './collections/Inquiries'
+import { DeliveryMethods } from './collections/DeliveryMethods'
+import { Orders } from './collections/Orders'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,7 +25,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Projects, Products, Inquiries],
+  collections: [Users, Media, Projects, Products, DeliveryMethods, Orders, Inquiries],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'ogedecor-dev-secret-key-replace-in-production-2026',
   typescript: {
