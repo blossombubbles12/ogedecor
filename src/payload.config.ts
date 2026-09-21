@@ -17,6 +17,9 @@ import { Orders } from './collections/Orders'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const rawBlobToken = process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN || ''
+const blobToken = rawBlobToken.trim().replace(/^["']|["']$/g, '')
+
 export default buildConfig({
   sharp,
   admin: {
@@ -38,11 +41,11 @@ export default buildConfig({
   }),
   plugins: [
     vercelBlobStorage({
-      enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+      enabled: Boolean(blobToken),
       collections: {
         media: true,
       },
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: blobToken,
     }),
   ],
 })

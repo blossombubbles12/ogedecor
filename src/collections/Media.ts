@@ -4,6 +4,7 @@ export const Media: CollectionConfig = {
   slug: 'media',
   upload: {
     staticDir: 'public/media',
+    disableLocalStorage: Boolean(process.env.VERCEL || process.env.BLOB_READ_WRITE_TOKEN),
     imageSizes: [
       {
         name: 'thumbnail',
