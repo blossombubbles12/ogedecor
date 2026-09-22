@@ -9,7 +9,8 @@ import { useCart } from "@/context/CartContext";
 
 const MOCK_PRODUCTS = [
     {
-        id: "101",
+        id: "p1",
+        slug: "ashanti-stool-gold-edition",
         name: "Ashanti Stool - Gold Edition",
         price: 450,
         formattedPrice: "$450.00",
@@ -17,23 +18,26 @@ const MOCK_PRODUCTS = [
         image: "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=800&auto=format&fit=crop"
     },
     {
-        id: "102",
+        id: "p2",
+        slug: "wakandan-geometry-vase",
         name: "Wakandan Geometry Vase",
-        price: 120,
-        formattedPrice: "$120.00",
+        price: 180,
+        formattedPrice: "$180.00",
         currency: "USD",
         image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?q=80&w=800&auto=format&fit=crop"
     },
     {
-        id: "103",
+        id: "p3",
+        slug: "savanna-velvet-cushion",
         name: "Savanna Velvet Cushion",
-        price: 85,
-        formattedPrice: "$85.00",
+        price: 95,
+        formattedPrice: "$95.00",
         currency: "USD",
         image: "https://images.unsplash.com/photo-1584100936555-5c911b6d0590?q=80&w=800&auto=format&fit=crop"
     },
     {
-        id: "104",
+        id: "p4",
+        slug: "kalahari-onyx-sconce",
         name: "Kalahari Onyx Sconce",
         price: 340,
         formattedPrice: "$340.00",
@@ -99,14 +103,16 @@ export default function ShopPreview() {
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: index * 0.05 }}
                                 viewport={{ once: true }}
-                                className="group cursor-pointer flex flex-col"
+                                className="group flex flex-col"
                             >
-                                <div className="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-neutral-900 rounded-lg sm:rounded-xl mb-3 sm:mb-4">
-                                    <div
-                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                                        style={{ backgroundImage: `url(${product.image})` }}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-50 group-hover:opacity-30 transition-opacity" />
+                                <div className="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-neutral-900 rounded-lg sm:rounded-xl mb-3 sm:mb-4 group/img">
+                                    <Link href={`/shop/${product.slug || product.id}`} className="block w-full h-full">
+                                        <div
+                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover/img:scale-105"
+                                            style={{ backgroundImage: `url(${product.image})` }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-50 group-hover/img:opacity-30 transition-opacity" />
+                                    </Link>
 
                                     {/* Mobile Tap / Desktop Hover Quick Add Button */}
                                     <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
@@ -122,9 +128,11 @@ export default function ShopPreview() {
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline gap-0.5 sm:gap-2">
-                                    <h3 className="text-xs sm:text-base md:text-lg font-serif text-sand group-hover:text-gold transition-colors line-clamp-1">
-                                        {product.name}
-                                    </h3>
+                                    <Link href={`/shop/${product.slug || product.id}`} className="group/title">
+                                        <h3 className="text-xs sm:text-base md:text-lg font-serif text-sand group-hover/title:text-gold transition-colors line-clamp-1">
+                                            {product.name}
+                                        </h3>
+                                    </Link>
                                     <span className="text-xs sm:text-sm text-gold font-medium flex-shrink-0">
                                         {product.formattedPrice || `$${product.price}`}
                                     </span>

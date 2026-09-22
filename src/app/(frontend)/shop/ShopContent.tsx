@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Filter, Truck, ShieldCheck, Sparkles, Check, Eye, X, ArrowRight } from "lucide-react";
 import { getShopProducts } from "@/app/actions";
@@ -11,6 +12,7 @@ const CATEGORIES = ["All", "Furniture", "Lighting", "Art & Decor", "Textiles", "
 const FALLBACK_PRODUCTS = [
     {
         id: "p1",
+        slug: "ashanti-stool-gold-edition",
         name: "Ashanti Stool - Gold Edition",
         subtitle: "Handcrafted Solid Mahogany with 24k Gold Leaf",
         price: 450,
@@ -28,6 +30,7 @@ const FALLBACK_PRODUCTS = [
     },
     {
         id: "p2",
+        slug: "wakandan-geometry-vase",
         name: "Wakandan Geometry Vase",
         subtitle: "Hand-Thrown Ceramic with West African Relief",
         price: 180,
@@ -45,6 +48,7 @@ const FALLBACK_PRODUCTS = [
     },
     {
         id: "p3",
+        slug: "savanna-velvet-cushion",
         name: "Savanna Velvet Cushion",
         subtitle: "Embroidered Architectural Silk-Velvet",
         price: 95,
@@ -62,6 +66,7 @@ const FALLBACK_PRODUCTS = [
     },
     {
         id: "p4",
+        slug: "kalahari-onyx-sconce",
         name: "Kalahari Onyx Sconce",
         subtitle: "Translucent African Onyx with Solid Brass Backplate",
         price: 340,
@@ -71,14 +76,15 @@ const FALLBACK_PRODUCTS = [
         sku: "OGE-LIGHT-004",
         stockQuantity: 6,
         inStock: true,
-        materials: "Honed Kalahari Onyx, Unlacquered Brushed Brass, LED Module",
+        materials: "African Onyx, Brushed Brass, Warm Dimmable LED",
         dimensions: { height: "35 cm", width: "15 cm", depth: "12 cm", weight: "3.8 kg" },
         deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: true, whiteGloveRequired: false },
         image: "https://images.unsplash.com/photo-1507473885765-e6ed60516b12?q=80&w=1200",
-        description: "Natural onyx stone cylinder providing a warm, diffused crystalline glow for atmospheric spaces."
+        description: "Carved from solid onyx cylinders, this architectural sconce radiates a warm, crystalline diffused light."
     },
     {
         id: "p5",
+        slug: "terracotta-relief-mask",
         name: "Terracotta Relief Mask",
         subtitle: "Sculptural Gallery Wall Accent",
         price: 210,
@@ -96,6 +102,7 @@ const FALLBACK_PRODUCTS = [
     },
     {
         id: "p6",
+        slug: "baobab-root-sculptural-table",
         name: "Baobab Root Sculptural Table",
         subtitle: "Reclaimed Aged Timber with Volcanic Wax",
         price: 890,
@@ -281,16 +288,18 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                             className="group bg-[#121215] border border-white/5 rounded-xl sm:rounded-2xl overflow-hidden hover:border-gold/30 transition-all duration-500 flex flex-col"
                         >
                             {/* Product Image */}
-                            <div className="relative aspect-square sm:aspect-[4/3] overflow-hidden bg-neutral-900 cursor-pointer" onClick={() => setSelectedProduct(product)}>
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                            <div className="relative aspect-square sm:aspect-[4/3] overflow-hidden bg-neutral-900 group/img">
+                                <Link href={`/shop/${product.slug || product.id}`} className="block w-full h-full">
+                                    <img
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover/img:opacity-40 transition-opacity" />
+                                </Link>
 
                                 {/* Category Badge */}
-                                <div className="absolute top-2 sm:top-4 left-2 sm:left-4 flex gap-1.5">
+                                <div className="absolute top-2 sm:top-4 left-2 sm:left-4 flex gap-1.5 pointer-events-none">
                                     <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-black/60 backdrop-blur-md border border-white/10 text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest uppercase font-medium rounded-full text-gold">
                                         {product.category}
                                     </span>
@@ -299,6 +308,7 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                                 {/* Quick View Button Overlay */}
                                 <button
                                     onClick={(e) => {
+                                        e.preventDefault();
                                         e.stopPropagation();
                                         setSelectedProduct(product);
                                     }}
@@ -313,9 +323,11 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                             <div className="p-3 sm:p-6 flex-1 flex flex-col justify-between space-y-2 sm:space-y-4">
                                 <div>
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline gap-0.5 sm:gap-2 mb-1">
-                                        <h3 className="font-serif text-sm sm:text-xl text-sand group-hover:text-gold transition-colors line-clamp-1">
-                                            {product.name}
-                                        </h3>
+                                        <Link href={`/shop/${product.slug || product.id}`} className="group/title">
+                                            <h3 className="font-serif text-sm sm:text-xl text-sand group-hover/title:text-gold transition-colors line-clamp-1">
+                                                {product.name}
+                                            </h3>
+                                        </Link>
                                         <span className="font-serif text-sm sm:text-lg text-gold font-medium flex-shrink-0">
                                             {product.formattedPrice || `$${product.price}`}
                                         </span>
@@ -456,16 +468,24 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                                 )}
                             </div>
 
-                            <div className="flex gap-4 pt-2">
+                            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                                <Link
+                                    href={`/shop/${selectedProduct.slug || selectedProduct.id}`}
+                                    onClick={() => setSelectedProduct(null)}
+                                    className="py-3.5 px-5 bg-white/5 hover:bg-white/10 text-sand border border-white/10 hover:border-gold rounded-xl uppercase tracking-wider text-xs font-medium flex items-center justify-center gap-2 transition-all order-2 sm:order-1"
+                                >
+                                    <span>Full Details & Specs</span>
+                                    <ArrowRight size={14} />
+                                </Link>
                                 <button
                                     onClick={() => {
                                         handleAddToCart(selectedProduct);
                                         setSelectedProduct(null);
                                     }}
-                                    className="flex-1 py-4 bg-gold text-obsidian font-bold tracking-wider uppercase text-xs rounded-xl hover:bg-gold-light transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
+                                    className="flex-1 py-3.5 bg-gold text-obsidian font-bold tracking-wider uppercase text-xs rounded-xl hover:bg-gold-light transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20 order-1 sm:order-2"
                                 >
                                     <ShoppingBag size={16} />
-                                    Add Piece to Bag
+                                    <span>Add Piece to Bag</span>
                                 </button>
                             </div>
                         </motion.div>
