@@ -46,45 +46,45 @@ export default function FeaturedProjects() {
     ];
 
     return (
-        <section id="projects" className="py-24 bg-strip-pattern">
-            <div className="container mx-auto px-6">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+        <section id="projects" className="py-16 sm:py-24 bg-strip-pattern">
+            <div className="container mx-auto px-3 sm:px-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 sm:mb-16">
                     <div>
-                        <h3 className="text-gold tracking-[0.2em] text-sm uppercase mb-4">Selected Works</h3>
-                        <h2 className="text-4xl md:text-5xl font-serif text-sand">Our Portfolio</h2>
+                        <h3 className="text-gold tracking-[0.2em] text-xs sm:text-sm uppercase mb-2 sm:mb-4">Selected Works</h3>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-sand">Our Portfolio</h2>
                     </div>
-                    <Link href="/projects" className="group flex items-center gap-2 text-white/60 hover:text-gold transition-colors mt-6 md:mt-0">
-                        View All Projects
-                        <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                    <Link href="/projects" className="group flex items-center gap-2 text-white/60 hover:text-gold transition-colors mt-4 md:mt-0 text-xs sm:text-sm uppercase tracking-wider font-medium">
+                        <span>View All Projects</span>
+                        <ArrowUpRight size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
                     {displayProjects.map((project: any, index: number) => {
                         const firstMedia = Array.isArray(project.media) ? project.media[0] : project.media;
                         const imageUrl = typeof firstMedia === 'string' ? firstMedia : firstMedia?.url;
-                        const size = index === 0 || index === 3 ? "col-span-1 md:col-span-2" : "col-span-1";
+                        const size = index === 0 || index === 3 ? "col-span-2 md:col-span-2" : "col-span-1";
 
                         return (
-                            <Link href={`/projects/${project.id}`} key={project.id}>
+                            <Link href={`/projects/${project.id}`} key={project.id} className={size}>
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
+                                    transition={{ delay: index * 0.05 }}
                                     viewport={{ once: true }}
-                                    className={`group relative h-[400px] overflow-hidden bg-neutral-900 cursor-pointer ${size}`}
+                                    className="group relative h-[200px] sm:h-[320px] md:h-[400px] overflow-hidden bg-neutral-900 cursor-pointer rounded-lg sm:rounded-xl"
                                 >
                                     <div
                                         className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                                         style={{ backgroundImage: `url(${imageUrl})` }}
                                     />
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/90 transition-colors duration-300" />
 
-                                    <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                        <p className="text-gold text-xs uppercase tracking-widest mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                                    <div className="absolute bottom-0 left-0 right-0 p-3.5 sm:p-6 md:p-8">
+                                        <p className="text-gold text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest mb-1 sm:mb-2 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
                                             {project.category}
                                         </p>
-                                        <h3 className="text-2xl font-serif text-white">{project.title}</h3>
+                                        <h3 className="text-sm sm:text-xl md:text-2xl font-serif text-white line-clamp-1">{project.title}</h3>
                                     </div>
                                 </motion.div>
                             </Link>

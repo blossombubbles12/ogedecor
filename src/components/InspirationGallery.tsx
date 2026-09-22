@@ -17,15 +17,15 @@ export default function InspirationGallery() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     return (
-        <section id="inspiration" className="py-24 bg-strip-pattern">
-            <div className="container mx-auto px-6">
-                <div className="text-center mb-16">
-                    <h3 className="text-gold tracking-[0.2em] text-sm uppercase mb-4">Moodboard</h3>
-                    <h2 className="text-4xl md:text-5xl font-serif text-sand">Inspiration Gallery</h2>
+        <section id="inspiration" className="py-16 sm:py-24 bg-strip-pattern">
+            <div className="container mx-auto px-3 sm:px-6">
+                <div className="text-center mb-10 sm:mb-16">
+                    <h3 className="text-gold tracking-[0.2em] text-xs sm:text-sm uppercase mb-2 sm:mb-4">Moodboard</h3>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-sand">Inspiration Gallery</h2>
                 </div>
 
-                {/* Masonry CSS Grid */}
-                <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+                {/* Masonry CSS Grid - 2 columns on Mobile, 2 on MD, 3 on LG */}
+                <div className="columns-2 md:columns-2 lg:columns-3 gap-3 sm:gap-6 space-y-3 sm:space-y-6">
                     {galleryImages.map((src, index) => (
                         <motion.div
                             key={index}
@@ -33,12 +33,12 @@ export default function InspirationGallery() {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             viewport={{ once: true }}
-                            className="relative group cursor-zoom-in break-inside-avoid overflow-hidden rounded-sm"
+                            className="relative group cursor-zoom-in break-inside-avoid overflow-hidden rounded-lg sm:rounded-xl"
                             onClick={() => setSelectedImage(src)}
                         >
                             <img src={src} alt={`Inspiration ${index + 1}`} className="w-full h-auto transition-transform duration-700 group-hover:scale-105" />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                <ZoomIn className="text-white drop-shadow-lg" size={32} />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                <ZoomIn className="text-white drop-shadow-lg" size={24} />
                             </div>
                         </motion.div>
                     ))}
