@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { sendOrderStatusUpdateEmail } from '../lib/email'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -10,6 +11,48 @@ export const Orders: CollectionConfig = {
   access: {
     read: () => true,
     create: () => true,
+  },
+  hooks: {
+    afterChange: [
+      async ({ doc, previousDoc, operation }) => {
+        if (operation === 'update' && previousDoc) {
+          const prevStatus = previousDoc.delivery?.deliveryStatus
+          const newStatus = doc.delivery?.deliveryStatus
+          if (newStatus && newStatus !== prevStatus) {
+            try {
+              await sendOrderStatusUpdateEmail(
+                {
+                  orderNumber: doc.orderNumber,
+                  customerName: doc.customerName,
+                  customerEmail: doc.customerEmail,
+                  customerPhone: doc.customerPhone,
+                  shippingAddress: doc.shippingAddress,
+                  items: (doc.items || []).map((item: any) => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    lineTotal: item.lineTotal,
+                    imageUrl: item.imageUrl,
+                  })),
+                  deliveryMethodTitle: doc.delivery?.methodTitle || 'Standard White-Glove',
+                  deliveryFee: doc.delivery?.deliveryFee || 0,
+                  subtotal: doc.financials?.subtotal || 0,
+                  grandTotal: doc.financials?.grandTotal || 0,
+                  currency: doc.financials?.currency || 'USD',
+                  paymentMethod: doc.financials?.paymentMethod || 'bank_transfer',
+                  deliveryStatus: newStatus,
+                  trackingNumber: doc.delivery?.trackingNumber,
+                  carrier: doc.delivery?.carrier,
+                },
+                newStatus
+              )
+            } catch (e) {
+              console.error('[Resend] Error in Orders afterChange hook email:', e)
+            }
+          }
+        }
+      },
+    ],
   },
   fields: [
     {

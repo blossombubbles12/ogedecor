@@ -3,6 +3,12 @@
 import { getPayloadClient } from "@/lib/payload";
 import { revalidatePath } from "next/cache";
 import { v2 as cloudinary } from "cloudinary";
+import {
+    sendOrderConfirmationEmail,
+    sendAdminNewOrderAlert,
+    sendInquiryNotificationEmail,
+    type OrderEmailData,
+} from "@/lib/email";
 
 if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
     cloudinary.config({
@@ -168,6 +174,17 @@ export async function createInquiry(data: {
                 status: "new",
             },
         });
+
+        // Trigger Resend notification (non-blocking)
+        sendInquiryNotificationEmail({
+            contactName: data.name,
+            contactInfo: data.email,
+            projectType: data.projectType,
+            budget: data.budget,
+            timeline: data.timeline,
+            mood: data.mood,
+        }).catch((err) => console.error("Resend inquiry notification error:", err));
+
         return { success: true, inquiry };
     } catch (error) {
         console.error("Error creating inquiry via Payload CMS:", error);
@@ -369,6 +386,34 @@ export async function createOrder(data: {
                 },
             },
         });
+
+        // Trigger Resend email notifications (non-blocking)
+        const emailOrderData: OrderEmailData = {
+            orderNumber,
+            customerName: data.customerName,
+            customerEmail: data.customerEmail,
+            customerPhone: data.customerPhone,
+            shippingAddress: data.shippingAddress,
+            items: data.items.map((item) => ({
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                lineTotal: item.price * item.quantity,
+                imageUrl: item.imageUrl,
+            })),
+            deliveryMethodTitle: data.deliveryMethodTitle,
+            deliveryFee: data.deliveryFee,
+            subtotal,
+            grandTotal,
+            currency: data.currency || "USD",
+            paymentMethod: data.paymentMethod || "bank_transfer",
+            specialInstructions: data.specialInstructions,
+        };
+
+        Promise.allSettled([
+            sendOrderConfirmationEmail(emailOrderData),
+            sendAdminNewOrderAlert(emailOrderData),
+        ]).catch((err) => console.error("Error triggering Resend order emails:", err));
 
         revalidatePath("/shop");
         return { success: true, orderNumber, order };
