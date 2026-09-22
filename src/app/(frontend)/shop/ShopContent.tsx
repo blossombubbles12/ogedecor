@@ -254,9 +254,9 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                 )}
             </AnimatePresence>
 
-            <div className="container mx-auto px-6">
+            <div className="container mx-auto px-3 sm:px-6">
                 {/* Header Content */}
-                <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8 text-center md:text-left">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-10 sm:mb-16 gap-6 sm:gap-8 text-center md:text-left">
                     <div>
                         <motion.h3
                             initial={{ opacity: 0, x: -20 }}
@@ -269,11 +269,11 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-5xl md:text-7xl font-serif text-white tracking-tight"
+                            className="text-4xl sm:text-5xl md:text-7xl font-serif text-white tracking-tight"
                         >
                             Bespoke Decor
                         </motion.h1>
-                        <p className="text-white/60 text-sm max-w-lg mt-3">
+                        <p className="text-white/60 text-xs sm:text-sm max-w-lg mt-2 sm:mt-3">
                             Limited edition furniture, sculptural lighting, and African architectural accents designed for luxury living.
                         </p>
                     </div>
@@ -285,17 +285,17 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                         onClick={() => setIsCartOpen(true)}
                         className="relative group cursor-pointer"
                     >
-                        <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-6 py-4 rounded-xl hover:border-gold transition-all duration-300 shadow-xl group-hover:bg-white/[0.08]">
-                            <ShoppingBag className="text-gold" size={24} />
+                        <div className="flex items-center gap-3 sm:gap-4 bg-white/5 border border-white/10 px-4 sm:px-6 py-3 sm:py-4 rounded-xl hover:border-gold transition-all duration-300 shadow-xl group-hover:bg-white/[0.08]">
+                            <ShoppingBag className="text-gold" size={20} />
                             <div className="text-left">
-                                <p className="text-[10px] uppercase tracking-widest text-white/40">Your Bag</p>
-                                <p className="text-sand font-bold text-sm">
+                                <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-white/40">Your Bag</p>
+                                <p className="text-sand font-bold text-xs sm:text-sm">
                                     {totalCartCount} {totalCartCount === 1 ? "Piece" : "Pieces"}
                                 </p>
                             </div>
                         </div>
                         {totalCartCount > 0 && (
-                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gold text-obsidian rounded-full flex items-center justify-center text-[11px] font-bold shadow-lg shadow-gold/30 animate-pulse">
+                            <div className="absolute -top-2 -right-2 w-5 sm:w-6 h-5 sm:h-6 bg-gold text-obsidian rounded-full flex items-center justify-center text-[10px] sm:text-[11px] font-bold shadow-lg shadow-gold/30 animate-pulse">
                                 {totalCartCount}
                             </div>
                         )}
@@ -303,13 +303,13 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                 </div>
 
                 {/* Filters Row */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 border-y border-white/10 py-6">
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 mb-8 sm:mb-12 border-y border-white/10 py-4 sm:py-6">
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3">
                         {CATEGORIES.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`px-5 py-2 text-xs uppercase tracking-widest rounded-full transition-all duration-300 ${
+                                className={`px-3.5 sm:px-5 py-1.5 sm:py-2 text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest rounded-full transition-all duration-300 ${
                                     activeCategory === cat
                                         ? "bg-gold text-obsidian font-bold shadow-md shadow-gold/20"
                                         : "text-white/50 hover:text-white hover:bg-white/5"
@@ -320,7 +320,7 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                         ))}
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-white/50">
+                    <div className="hidden sm:flex items-center gap-4 text-xs text-white/50">
                         <span className="flex items-center gap-1.5">
                             <Truck size={14} className="text-gold" /> White-Glove Logistics
                         </span>
@@ -331,18 +331,18 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                     </div>
                 </div>
 
-                {/* Products Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {/* Products Grid - 2 columns on Mobile, 2 on MD, 3 on LG */}
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
                     {filteredProducts.map((product, idx) => (
                         <motion.div
                             key={product.id || idx}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.05 }}
-                            className="group bg-[#121215] border border-white/5 rounded-2xl overflow-hidden hover:border-gold/30 transition-all duration-500 flex flex-col"
+                            className="group bg-[#121215] border border-white/5 rounded-xl sm:rounded-2xl overflow-hidden hover:border-gold/30 transition-all duration-500 flex flex-col"
                         >
                             {/* Product Image */}
-                            <div className="relative aspect-[4/3] overflow-hidden bg-neutral-900 cursor-pointer" onClick={() => setSelectedProduct(product)}>
+                            <div className="relative aspect-square sm:aspect-[4/3] overflow-hidden bg-neutral-900 cursor-pointer" onClick={() => setSelectedProduct(product)}>
                                 <img
                                     src={product.image}
                                     alt={product.name}
@@ -350,9 +350,9 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
 
-                                {/* Category & Stock Badges */}
-                                <div className="absolute top-4 left-4 flex gap-2">
-                                    <span className="px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 text-[10px] tracking-widest uppercase font-medium rounded-full text-gold">
+                                {/* Category Badge */}
+                                <div className="absolute top-2 sm:top-4 left-2 sm:left-4 flex gap-1.5">
+                                    <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-black/60 backdrop-blur-md border border-white/10 text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest uppercase font-medium rounded-full text-gold">
                                         {product.category}
                                     </span>
                                 </div>
@@ -363,62 +363,62 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                                         e.stopPropagation();
                                         setSelectedProduct(product);
                                     }}
-                                    className="absolute bottom-4 right-4 p-2.5 bg-black/70 backdrop-blur-md rounded-full text-white/70 hover:text-gold hover:bg-black transition-all opacity-0 group-hover:opacity-100"
+                                    className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 p-1.5 sm:p-2.5 bg-black/70 backdrop-blur-md rounded-full text-white/70 hover:text-gold hover:bg-black transition-all opacity-0 group-hover:opacity-100"
                                     title="Quick Specifications"
                                 >
-                                    <Eye size={16} />
+                                    <Eye size={14} className="sm:w-4 sm:h-4" />
                                 </button>
                             </div>
 
                             {/* Product Details */}
-                            <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                            <div className="p-3 sm:p-6 flex-1 flex flex-col justify-between space-y-2 sm:space-y-4">
                                 <div>
-                                    <div className="flex justify-between items-baseline gap-2 mb-1">
-                                        <h3 className="font-serif text-xl text-sand group-hover:text-gold transition-colors">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline gap-0.5 sm:gap-2 mb-1">
+                                        <h3 className="font-serif text-sm sm:text-xl text-sand group-hover:text-gold transition-colors line-clamp-1">
                                             {product.name}
                                         </h3>
-                                        <span className="font-serif text-lg text-gold font-medium flex-shrink-0">
+                                        <span className="font-serif text-sm sm:text-lg text-gold font-medium flex-shrink-0">
                                             {product.formattedPrice || `$${product.price}`}
                                         </span>
                                     </div>
                                     {product.subtitle && (
-                                        <p className="text-xs text-white/50 line-clamp-1 mb-2">
+                                        <p className="text-[10px] sm:text-xs text-white/50 line-clamp-1 mb-1 sm:mb-2">
                                             {product.subtitle}
                                         </p>
                                     )}
-                                    <p className="text-xs text-white/60 line-clamp-2 leading-relaxed">
+                                    <p className="text-[11px] sm:text-xs text-white/60 line-clamp-2 leading-relaxed hidden sm:block">
                                         {product.description}
                                     </p>
                                 </div>
 
                                 {/* Delivery & Add to Cart */}
-                                <div className="pt-4 border-t border-white/5 space-y-3">
-                                    <div className="flex items-center justify-between text-[11px] text-white/40">
-                                        <span className="flex items-center gap-1.5 truncate">
-                                            <Truck size={12} className="text-gold flex-shrink-0" />
-                                            {product.deliveryInfo?.leadTime || "Dispatches in 2-3 days"}
+                                <div className="pt-2 sm:pt-4 border-t border-white/5 space-y-2 sm:space-y-3">
+                                    <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-white/40">
+                                        <span className="flex items-center gap-1 sm:gap-1.5 truncate">
+                                            <Truck size={11} className="text-gold flex-shrink-0" />
+                                            <span className="truncate">{product.deliveryInfo?.leadTime || "2-3 days"}</span>
                                         </span>
                                         {product.deliveryInfo?.whiteGloveRequired && (
-                                            <span className="text-[10px] text-gold/80 bg-gold/10 px-2 py-0.5 rounded">
+                                            <span className="hidden sm:inline text-[9px] sm:text-[10px] text-gold/80 bg-gold/10 px-1.5 sm:px-2 py-0.5 rounded">
                                                 White Glove
                                             </span>
                                         )}
                                     </div>
 
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-1.5 sm:gap-2">
                                         <button
                                             onClick={() => handleAddToCart(product)}
-                                            className="flex-1 py-3 bg-white/5 hover:bg-gold hover:text-obsidian text-sand border border-white/10 hover:border-gold rounded-xl text-xs uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+                                            className="flex-1 py-2 sm:py-3 bg-white/5 hover:bg-gold hover:text-obsidian text-sand border border-white/10 hover:border-gold rounded-lg sm:rounded-xl text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 group/btn"
                                         >
-                                            <ShoppingBag size={14} className="group-hover/btn:scale-110 transition-transform" />
-                                            Add to Bag
+                                            <ShoppingBag size={12} className="sm:w-3.5 sm:h-3.5 group-hover/btn:scale-110 transition-transform" />
+                                            <span>Add to Bag</span>
                                         </button>
                                         <button
                                             onClick={() => {
                                                 handleAddToCart(product);
                                                 setIsCartOpen(true);
                                             }}
-                                            className="px-4 py-3 bg-gold text-obsidian rounded-xl text-xs uppercase tracking-widest font-bold hover:bg-gold-light transition-all"
+                                            className="hidden sm:block px-3 sm:px-4 py-2 sm:py-3 bg-gold text-obsidian rounded-lg sm:rounded-xl text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest font-bold hover:bg-gold-light transition-all"
                                             title="Acquire Immediately"
                                         >
                                             Acquire
