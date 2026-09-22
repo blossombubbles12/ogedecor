@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/context/CartContext";
 
 export default function NavBar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { totalCount, openCart } = useCart();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -51,18 +53,33 @@ export default function NavBar() {
                                 {link.name}
                             </Link>
                         ))}
-                        <button className="relative hover:text-gold transition-colors">
-                            <ShoppingBag size={20} />
-                            <span className="absolute -top-1 -right-1 bg-gold text-obsidian text-[10px] w-3 h-3 flex items-center justify-center rounded-full">
-                                0
-                            </span>
+                        <button
+                            onClick={openCart}
+                            aria-label="Open Shopping Bag"
+                            className="relative hover:text-gold transition-colors p-1 group cursor-pointer"
+                        >
+                            <ShoppingBag size={20} className="group-hover:scale-105 transition-transform" />
+                            {totalCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-gold text-obsidian text-[10px] font-bold min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full shadow-md animate-pulse">
+                                    {totalCount}
+                                </span>
+                            )}
                         </button>
                     </nav>
 
                     {/* Mobile Toggle */}
                     <div className="md:hidden flex items-center gap-4">
-                        <button className="relative hover:text-gold transition-colors">
+                        <button
+                            onClick={openCart}
+                            aria-label="Open Shopping Bag"
+                            className="relative hover:text-gold transition-colors p-1 cursor-pointer"
+                        >
                             <ShoppingBag size={20} />
+                            {totalCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-gold text-obsidian text-[10px] font-bold min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full shadow-md animate-pulse">
+                                    {totalCount}
+                                </span>
+                            )}
                         </button>
                         <button onClick={() => setIsMobileMenuOpen(true)}>
                             <Menu size={24} className="text-sand" />

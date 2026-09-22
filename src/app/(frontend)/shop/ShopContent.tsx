@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Filter, Truck, ShieldCheck, Sparkles, Check, Eye, X, ArrowRight } from "lucide-react";
 import { getShopProducts } from "@/app/actions";
-import CartDrawer, { CartItem } from "@/components/CartDrawer";
-import CheckoutModal from "@/components/CheckoutModal";
+import { useCart } from "@/context/CartContext";
 
 const CATEGORIES = ["All", "Furniture", "Lighting", "Art & Decor", "Textiles", "Architectural Decor"];
 
@@ -126,35 +125,12 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
     const [activeCategory, setActiveCategory] = useState("All");
     const [loading, setLoading] = useState(!hasInitial);
     
-    // Cart and Checkout state
-    const [cartItems, setCartItems] = useState<CartItem[]>([]);
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+    // Global Cart State
+    const { totalCount: totalCartCount, addToCart, openCart } = useCart();
     
     // Quick View modal state
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
     const [addedToast, setAddedToast] = useState<string | null>(null);
-
-    // Load cart from localStorage
-    useEffect(() => {
-        try {
-            const savedCart = localStorage.getItem("ogedecor_cart");
-            if (savedCart) {
-                setCartItems(JSON.parse(savedCart));
-            }
-        } catch (e) {
-            console.warn("Could not load cart from localStorage", e);
-        }
-    }, []);
-
-    // Save cart to localStorage
-    useEffect(() => {
-        try {
-            localStorage.setItem("ogedecor_cart", JSON.stringify(cartItems));
-        } catch (e) {
-            console.warn("Could not save cart", e);
-        }
-    }, [cartItems]);
 
     useEffect(() => {
         if (!hasInitial) {
@@ -183,49 +159,12 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
         }
     }, [activeCategory, products]);
 
-    // Cart actions
+    // Cart action with feedback toast
     const handleAddToCart = (product: any) => {
-        setCartItems((prev) => {
-            const existing = prev.find((item) => item.id === product.id);
-            if (existing) {
-                return prev.map((item) =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-                );
-            }
-            return [
-                ...prev,
-                {
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    formattedPrice: product.formattedPrice || `$${product.price}`,
-                    currency: product.currency || "USD",
-                    image: product.image,
-                    quantity: 1,
-                    category: product.category,
-                    leadTime: product.deliveryInfo?.leadTime,
-                },
-            ];
-        });
-
-        // Trigger toast
+        addToCart(product);
         setAddedToast(product.name);
         setTimeout(() => setAddedToast(null), 3000);
     };
-
-    const handleUpdateQuantity = (id: string, delta: number) => {
-        setCartItems((prev) =>
-            prev
-                .map((item) => (item.id === id ? { ...item, quantity: item.quantity + delta } : item))
-                .filter((item) => item.quantity > 0)
-        );
-    };
-
-    const handleRemoveItem = (id: string) => {
-        setCartItems((prev) => prev.filter((item) => item.id !== id));
-    };
-
-    const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
         <main className="min-h-screen bg-obsidian pt-32 pb-24 text-sand">
@@ -245,7 +184,7 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                             <strong className="text-gold">{addedToast}</strong> added to shopping bag.
                         </span>
                         <button
-                            onClick={() => setIsCartOpen(true)}
+                            onClick={() => openCart()}
                             className="ml-2 text-xs uppercase tracking-wider text-gold hover:underline font-medium"
                         >
                             View Bag
@@ -282,7 +221,7 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        onClick={() => setIsCartOpen(true)}
+                        onClick={() => openCart()}
                         className="relative group cursor-pointer"
                     >
                         <div className="flex items-center gap-3 sm:gap-4 bg-white/5 border border-white/10 px-4 sm:px-6 py-3 sm:py-4 rounded-xl hover:border-gold transition-all duration-300 shadow-xl group-hover:bg-white/[0.08]">
@@ -416,7 +355,7 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                                         <button
                                             onClick={() => {
                                                 handleAddToCart(product);
-                                                setIsCartOpen(true);
+                                                openCart();
                                             }}
                                             className="hidden sm:block px-3 sm:px-4 py-2 sm:py-3 bg-gold text-obsidian rounded-lg sm:rounded-xl text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest font-bold hover:bg-gold-light transition-all"
                                             title="Acquire Immediately"
@@ -439,19 +378,20 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
                             onClick={() => setSelectedProduct(null)}
-                            className="fixed inset-0 bg-black/80 backdrop-blur-md"
                         />
+
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="relative w-full max-w-2xl bg-[#0F0F12] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10 p-6 md:p-8 space-y-6"
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative w-full max-w-2xl bg-[#121215] border border-gold/30 rounded-2xl p-6 md:p-8 shadow-2xl z-10 space-y-6 max-h-[90vh] overflow-y-auto"
                         >
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <span className="text-[10px] tracking-widest uppercase font-medium text-gold">
-                                        {selectedProduct.category} • SKU: {selectedProduct.sku}
+                                    <span className="text-xs uppercase tracking-widest text-gold font-medium">
+                                        {selectedProduct.category}
                                     </span>
                                     <h2 className="font-serif text-3xl text-sand mt-1">{selectedProduct.name}</h2>
                                     <p className="text-xl font-serif text-gold mt-1">
@@ -479,24 +419,39 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                             </p>
 
                             {/* Specifications Grid */}
-                            <div className="grid grid-cols-2 gap-4 bg-white/[0.02] border border-white/5 rounded-xl p-4 text-xs">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 border-y border-white/10 text-xs">
                                 <div>
-                                    <span className="text-white/40 block mb-1 uppercase tracking-wider text-[10px]">Materials & Finish</span>
-                                    <span className="text-sand">{selectedProduct.materials || "Natural Treated Mahogany & Brass"}</span>
+                                    <span className="text-white/40 block mb-1">Materials & Finishes:</span>
+                                    <span className="text-sand">{selectedProduct.materials || "Natural Mahogany, Brass Accents"}</span>
                                 </div>
                                 <div>
-                                    <span className="text-white/40 block mb-1 uppercase tracking-wider text-[10px]">Delivery Lead Time</span>
-                                    <span className="text-gold">{selectedProduct.deliveryInfo?.leadTime || "2 - 3 business days"}</span>
+                                    <span className="text-white/40 block mb-1">Lead Time:</span>
+                                    <span className="text-sand">{selectedProduct.deliveryInfo?.leadTime || "2-3 business days"}</span>
                                 </div>
-                                {selectedProduct.dimensions && (
-                                    <div className="col-span-2 pt-2 border-t border-white/5">
-                                        <span className="text-white/40 block mb-1 uppercase tracking-wider text-[10px]">Dimensions</span>
-                                        <span className="text-sand">
-                                            {selectedProduct.dimensions.height && `H: ${selectedProduct.dimensions.height} `}
-                                            {selectedProduct.dimensions.width && `• W: ${selectedProduct.dimensions.width} `}
-                                            {selectedProduct.dimensions.depth && `• D: ${selectedProduct.dimensions.depth} `}
-                                            {selectedProduct.dimensions.weight && `• Weight: ${selectedProduct.dimensions.weight}`}
-                                        </span>
+                                <div>
+                                    <span className="text-white/40 block mb-1">Dimensions:</span>
+                                    <span className="text-sand">
+                                        {selectedProduct.dimensions?.height} (H) × {selectedProduct.dimensions?.width} (W) × {selectedProduct.dimensions?.depth} (D)
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="text-white/40 block mb-1">Handling Protocol:</span>
+                                    <span className="text-sand">
+                                        {selectedProduct.deliveryInfo?.whiteGloveRequired ? "White-Glove Included" : "Standard Insured Transport"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Delivery highlights */}
+                            <div className="bg-white/5 p-4 rounded-xl space-y-2 border border-white/5">
+                                <div className="flex items-center gap-2 text-xs text-sand font-medium">
+                                    <ShieldCheck size={16} className="text-gold" />
+                                    <span>Verified Ogedecor Authenticity & Master Craft Certificate</span>
+                                </div>
+                                {selectedProduct.deliveryInfo?.whiteGloveRequired && (
+                                    <div className="flex items-center gap-2 text-xs text-white/60">
+                                        <Truck size={16} className="text-gold" />
+                                        <span>Complimentary room-of-choice placement and packaging de-installation.</span>
                                     </div>
                                 )}
                             </div>
@@ -517,29 +472,6 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                     </div>
                 )}
             </AnimatePresence>
-
-            {/* Cart Drawer */}
-            <CartDrawer
-                isOpen={isCartOpen}
-                onClose={() => setIsCartOpen(false)}
-                items={cartItems}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
-                onCheckout={() => {
-                    setIsCartOpen(false);
-                    setIsCheckoutOpen(true);
-                }}
-            />
-
-            {/* Checkout Modal */}
-            <CheckoutModal
-                isOpen={isCheckoutOpen}
-                onClose={() => setIsCheckoutOpen(false)}
-                items={cartItems}
-                onOrderSuccess={() => {
-                    setCartItems([]);
-                }}
-            />
         </main>
     );
 }
