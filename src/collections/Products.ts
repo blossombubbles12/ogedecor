@@ -1,5 +1,16 @@
 import type { CollectionConfig } from 'payload'
 
+/** Converts a product name into a clean URL slug, e.g. "Ashanti Stool – Gold!" → "ashanti-stool-gold" */
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')   // strip special chars
+    .trim()
+    .replace(/\s+/g, '-')            // spaces → hyphens
+    .replace(/-+/g, '-')             // collapse multiple hyphens
+    .replace(/^-|-$/g, '');          // strip leading/trailing hyphens
+}
+
 export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
@@ -9,6 +20,22 @@ export const Products: CollectionConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        // Auto-generate slug from name if left blank
+        if (!data.slug || data.slug.trim() === '') {
+          if (data.name) {
+            data.slug = generateSlug(data.name);
+          }
+        } else {
+          // Normalise any manually entered slug
+          data.slug = generateSlug(data.slug);
+        }
+        return data;
+      },
+    ],
   },
   fields: [
     {
@@ -22,7 +49,8 @@ export const Products: CollectionConfig = {
       type: 'text',
       label: 'URL Slug',
       admin: {
-        placeholder: 'e.g. ashanti-stool-gold-edition',
+        placeholder: 'Auto-generated from product name if left blank',
+        description: 'Leave blank to auto-generate from the product name. Used in the shop URL: /shop/your-slug',
       },
     },
     {

@@ -210,11 +210,15 @@ export async function getShopProducts() {
             const rawPrice = typeof doc.price === "number" ? doc.price : parseFloat(String(doc.price).replace(/[^0-9.]/g, "")) || 0;
             const currencySymbol = doc.currency === "NGN" ? "₦" : doc.currency === "EUR" ? "€" : doc.currency === "GBP" ? "£" : "$";
             const formattedPrice = `${currencySymbol}${rawPrice.toLocaleString()}`;
+            // Always generate a slug from name if the slug field was left blank in admin
+            const slug = doc.slug && doc.slug.trim() !== ""
+                ? doc.slug
+                : doc.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
             return {
                 id: String(doc.id),
                 name: doc.name,
-                slug: doc.slug || doc.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                slug,
                 subtitle: doc.subtitle || "",
                 description: doc.description || "",
                 category: doc.category || "Furniture",
@@ -245,162 +249,34 @@ export async function getShopProducts() {
     }
 }
 
-const FALLBACK_CATALOG = [
-    {
-        id: "p1",
-        name: "Ashanti Stool - Gold Edition",
-        slug: "ashanti-stool-gold-edition",
-        subtitle: "Handcrafted Solid Mahogany with 24k Gold Leaf Trim",
-        price: 450,
-        formattedPrice: "$450.00",
-        currency: "USD",
-        compareAtPrice: 550,
-        category: "Furniture",
-        sku: "OGE-FURN-001",
-        stockQuantity: 8,
-        inStock: true,
-        materials: "Solid African Mahogany, 24k Gold Leaf Gilding, Hand-Rubbed Natural Beeswax",
-        dimensions: { height: "45 cm", width: "55 cm", depth: "35 cm", weight: "9 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: false, whiteGloveRequired: true },
-        image: "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=1200",
-        gallery: [
-            "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=1200",
-            "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1200",
-            "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=1200",
-        ],
-        description: "Handcrafted from ethically sourced solid mahogany and embellished with antique 24k gold leaf, the Ashanti Stool is inspired by Ghanaian royal ceremonial thrones. Each stool features fluid organic curves balanced by structural architectural strength, serving as an arresting sculptural statement piece in contemporary interiors."
-    },
-    {
-        id: "p2",
-        name: "Wakandan Geometry Vase",
-        slug: "wakandan-geometry-vase",
-        subtitle: "Hand-Thrown Ceramic with West African Relief",
-        price: 180,
-        formattedPrice: "$180.00",
-        currency: "USD",
-        compareAtPrice: 220,
-        category: "Art & Decor",
-        sku: "OGE-ART-002",
-        stockQuantity: 14,
-        inStock: true,
-        materials: "High-Fire Terracotta Clay, Matte Basalt Mineral Glaze",
-        dimensions: { height: "38 cm", width: "22 cm", depth: "22 cm", weight: "4.5 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: true, whiteGloveRequired: false },
-        image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?q=80&w=1200",
-        gallery: [
-            "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?q=80&w=1200",
-            "https://images.unsplash.com/photo-1513519245088-0e12902e15ca?q=80&w=1200",
-        ],
-        description: "Modern ceramic vase featuring intricate relief carvings inspired by West African geometric symbology. Finished in an ultra-matte volcanic basalt glaze that shifts subtly under ambient lighting."
-    },
-    {
-        id: "p3",
-        name: "Savanna Velvet Cushion",
-        slug: "savanna-velvet-cushion",
-        subtitle: "Embroidered Architectural Silk-Velvet",
-        price: 95,
-        formattedPrice: "$95.00",
-        currency: "USD",
-        compareAtPrice: 120,
-        category: "Textiles",
-        sku: "OGE-TEXT-003",
-        stockQuantity: 25,
-        inStock: true,
-        materials: "100% Silk Velvet, Hungarian Goose Down Insert, Metallic Thread Embroidery",
-        dimensions: { height: "50 cm", width: "50 cm", depth: "15 cm", weight: "1.2 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: false, whiteGloveRequired: false },
-        image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=1200",
-        gallery: [
-            "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=1200",
-            "https://images.unsplash.com/photo-1584100936555-5c911b6d0590?q=80&w=1200",
-        ],
-        description: "Bespoke decorative cushion crafted from rich architectural silk-velvet with metallic thread accents. The hand-guided embroidery depicts the golden horizons of the African savanna at twilight."
-    },
-    {
-        id: "p4",
-        name: "Kalahari Onyx Sconce",
-        slug: "kalahari-onyx-sconce",
-        subtitle: "Translucent African Onyx with Solid Brass Backplate",
-        price: 340,
-        formattedPrice: "$340.00",
-        currency: "USD",
-        compareAtPrice: 400,
-        category: "Lighting",
-        sku: "OGE-LIGHT-004",
-        stockQuantity: 6,
-        inStock: true,
-        materials: "Honed Kalahari Calcite Onyx, Unlacquered Brushed Brass, Dimmable Warm LED Module",
-        dimensions: { height: "35 cm", width: "15 cm", depth: "12 cm", weight: "3.8 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: true, whiteGloveRequired: false },
-        image: "https://images.unsplash.com/photo-1507473885765-e6ed60516b12?q=80&w=1200",
-        gallery: [
-            "https://images.unsplash.com/photo-1507473885765-e6ed60516b12?q=80&w=1200",
-        ],
-        description: "Carved from solid Kalahari onyx cylinders, this architectural sconce radiates a warm, crystalline diffused light. Paired with hand-brushed unlacquered brass hardware that develops an organic patina over time."
-    },
-    {
-        id: "p5",
-        name: "Terracotta Relief Mask",
-        slug: "terracotta-relief-mask",
-        subtitle: "Sculptural Gallery Wall Accent",
-        price: 210,
-        formattedPrice: "$210.00",
-        currency: "USD",
-        compareAtPrice: 260,
-        category: "Art & Decor",
-        sku: "OGE-ART-005",
-        stockQuantity: 10,
-        inStock: true,
-        materials: "Aged Terracotta, Smoked Charcoal Mineral Pigment, Concealed Brass Mounting",
-        dimensions: { height: "60 cm", width: "28 cm", depth: "12 cm", weight: "5 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: true, whiteGloveRequired: false },
-        image: "https://images.unsplash.com/photo-1513519245088-0e12902e15ca?q=80&w=1200",
-        gallery: [
-            "https://images.unsplash.com/photo-1513519245088-0e12902e15ca?q=80&w=1200",
-        ],
-        description: "Contemporary interpretation of classical West African ritual masks, sculpted from mineral-rich terracotta with hand-applied smoked charcoal pigment. Engineered with concealed brass suspension."
-    },
-    {
-        id: "p6",
-        name: "Baobab Root Sculptural Table",
-        slug: "baobab-root-sculptural-table",
-        subtitle: "Reclaimed Aged Timber with Volcanic Wax",
-        price: 890,
-        formattedPrice: "$890.00",
-        currency: "USD",
-        compareAtPrice: 1100,
-        category: "Furniture",
-        sku: "OGE-FURN-006",
-        stockQuantity: 3,
-        inStock: true,
-        materials: "Reclaimed Aged Timber, Volcanic Obsidian Wax Treatment, Burnished Brass Feet",
-        dimensions: { height: "52 cm", width: "65 cm", depth: "60 cm", weight: "22 kg" },
-        deliveryInfo: { leadTime: "White-glove scheduled delivery within 5 days", isFragile: false, whiteGloveRequired: true },
-        image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1200",
-        gallery: [
-            "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1200",
-        ],
-        description: "One-of-a-kind sculptural accent table carved from preserved aged baobab timber roots, celebrating raw organic silhouettes and natural cracks stabilized with volcanic wax and bronze pins."
-    },
-];
 
 // Fetch single product by slug or id with rich details
 export async function getProductBySlug(slugOrId: string) {
     try {
         const payload = await getPayloadClient();
-        const result = await payload.find({
+
+        // Strategy 1: query by slug field first
+        const bySlug = await payload.find({
             collection: "products",
-            where: {
-                or: [
-                    { slug: { equals: slugOrId } },
-                    { id: { equals: slugOrId } },
-                ],
-            },
+            where: { slug: { equals: slugOrId } },
             limit: 1,
         });
 
-        if (result.docs && result.docs.length > 0) {
-            const doc: any = result.docs[0];
+        // Strategy 2: if no slug match, try by numeric/string ID
+        let doc: any = bySlug.docs?.[0];
+        if (!doc) {
+            // Also try matching products whose name-derived slug equals slugOrId
+            const all = await payload.find({
+                collection: "products",
+                limit: 200,
+            });
+            doc = all.docs?.find((d: any) => {
+                const derived = (d as any).name?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                return String((d as any).id) === slugOrId || derived === slugOrId;
+            });
+        }
+
+        if (doc) {
             const rawPrice = typeof doc.price === "number" ? doc.price : parseFloat(String(doc.price).replace(/[^0-9.]/g, "")) || 0;
             const currencySymbol = doc.currency === "NGN" ? "₦" : doc.currency === "EUR" ? "€" : doc.currency === "GBP" ? "£" : "$";
             const formattedPrice = `${currencySymbol}${rawPrice.toLocaleString()}`;
@@ -418,10 +294,14 @@ export async function getProductBySlug(slugOrId: string) {
                 });
             }
 
+            const slug = doc.slug && doc.slug.trim() !== ""
+                ? doc.slug
+                : doc.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
             return {
                 id: String(doc.id),
                 name: doc.name,
-                slug: doc.slug || doc.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                slug,
                 subtitle: doc.subtitle || "",
                 description: doc.description || "",
                 category: doc.category || "Furniture",
@@ -445,14 +325,10 @@ export async function getProductBySlug(slugOrId: string) {
             };
         }
     } catch (e) {
-        console.warn("Could not find product in DB, trying showcase catalog:", e);
+        console.warn("Could not find product in DB:", e);
     }
 
-    // Match fallback catalog
-    const matched = FALLBACK_CATALOG.find(
-        (p) => p.slug === slugOrId || p.id === slugOrId || p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slugOrId
-    );
-    return matched || null;
+    return null;
 }
 
 // Get related products for product detail page
@@ -487,10 +363,10 @@ export async function getRelatedProducts(category: string, excludeId: string) {
             });
         }
     } catch {
-        // fallback
+        // no related products available
     }
 
-    return FALLBACK_CATALOG.filter((p) => p.id !== excludeId).slice(0, 4);
+    return [];
 }
 
 // Get active delivery methods from Payload CMS

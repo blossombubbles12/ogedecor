@@ -3,134 +3,23 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Filter, Truck, ShieldCheck, Sparkles, Check, Eye, X, ArrowRight } from "lucide-react";
-import { getShopProducts } from "@/app/actions";
+import { ShoppingBag, Filter, Truck, ShieldCheck, Sparkles, Check, Eye, X, ArrowRight, Package } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
 const CATEGORIES = ["All", "Furniture", "Lighting", "Art & Decor", "Textiles", "Architectural Decor"];
 
-const FALLBACK_PRODUCTS = [
-    {
-        id: "p1",
-        slug: "ashanti-stool-gold-edition",
-        name: "Ashanti Stool - Gold Edition",
-        subtitle: "Handcrafted Solid Mahogany with 24k Gold Leaf",
-        price: 450,
-        formattedPrice: "$450.00",
-        currency: "USD",
-        category: "Furniture",
-        sku: "OGE-FURN-001",
-        stockQuantity: 8,
-        inStock: true,
-        materials: "Solid Mahogany, 24k Gold Leaf Trim, Natural Wax Finish",
-        dimensions: { height: "45 cm", width: "55 cm", depth: "35 cm", weight: "9 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: false, whiteGloveRequired: true },
-        image: "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=1200",
-        description: "Handcrafted with sustainable mahogany and finished with antique gold leaf, inspired by royal ceremonial seats."
-    },
-    {
-        id: "p2",
-        slug: "wakandan-geometry-vase",
-        name: "Wakandan Geometry Vase",
-        subtitle: "Hand-Thrown Ceramic with West African Relief",
-        price: 180,
-        formattedPrice: "$180.00",
-        currency: "USD",
-        category: "Art & Decor",
-        sku: "OGE-ART-002",
-        stockQuantity: 14,
-        inStock: true,
-        materials: "High-Fire Terracotta Clay, Matte Basalt Glaze",
-        dimensions: { height: "38 cm", width: "22 cm", depth: "22 cm", weight: "4.5 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: true, whiteGloveRequired: false },
-        image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?q=80&w=1200",
-        description: "Modern ceramic vase featuring intricate relief carvings inspired by West African geometric symbology."
-    },
-    {
-        id: "p3",
-        slug: "savanna-velvet-cushion",
-        name: "Savanna Velvet Cushion",
-        subtitle: "Embroidered Architectural Silk-Velvet",
-        price: 95,
-        formattedPrice: "$95.00",
-        currency: "USD",
-        category: "Textiles",
-        sku: "OGE-TEXT-003",
-        stockQuantity: 25,
-        inStock: true,
-        materials: "100% Silk Velvet, Goose Down Insert, Metallic Embroidery",
-        dimensions: { height: "50 cm", width: "50 cm", depth: "15 cm", weight: "1.2 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: false, whiteGloveRequired: false },
-        image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=1200",
-        description: "Bespoke decorative cushion crafted from rich architectural silk-velvet with metallic thread accents."
-    },
-    {
-        id: "p4",
-        slug: "kalahari-onyx-sconce",
-        name: "Kalahari Onyx Sconce",
-        subtitle: "Translucent African Onyx with Solid Brass Backplate",
-        price: 340,
-        formattedPrice: "$340.00",
-        currency: "USD",
-        category: "Lighting",
-        sku: "OGE-LIGHT-004",
-        stockQuantity: 6,
-        inStock: true,
-        materials: "African Onyx, Brushed Brass, Warm Dimmable LED",
-        dimensions: { height: "35 cm", width: "15 cm", depth: "12 cm", weight: "3.8 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 2-3 business days", isFragile: true, whiteGloveRequired: false },
-        image: "https://images.unsplash.com/photo-1507473885765-e6ed60516b12?q=80&w=1200",
-        description: "Carved from solid onyx cylinders, this architectural sconce radiates a warm, crystalline diffused light."
-    },
-    {
-        id: "p5",
-        slug: "terracotta-relief-mask",
-        name: "Terracotta Relief Mask",
-        subtitle: "Sculptural Gallery Wall Accent",
-        price: 210,
-        formattedPrice: "$210.00",
-        currency: "USD",
-        category: "Art & Decor",
-        sku: "OGE-ART-005",
-        stockQuantity: 10,
-        inStock: true,
-        materials: "Aged Terracotta, Smoked Charcoal Pigment",
-        dimensions: { height: "60 cm", width: "28 cm", depth: "12 cm", weight: "5 kg" },
-        deliveryInfo: { leadTime: "Ready to ship in 24 hours", isFragile: true, whiteGloveRequired: false },
-        image: "https://images.unsplash.com/photo-1513519245088-0e12902e15ca?q=80&w=1200",
-        description: "Contemporary interpretation of classical terracotta masks, mounted with concealed brass suspension."
-    },
-    {
-        id: "p6",
-        slug: "baobab-root-sculptural-table",
-        name: "Baobab Root Sculptural Table",
-        subtitle: "Reclaimed Aged Timber with Volcanic Wax",
-        price: 890,
-        formattedPrice: "$890.00",
-        currency: "USD",
-        category: "Furniture",
-        sku: "OGE-FURN-006",
-        stockQuantity: 3,
-        inStock: true,
-        materials: "Reclaimed Baobab Wood, Volcanic Obsidian Wax Treatment",
-        dimensions: { height: "52 cm", width: "65 cm", depth: "60 cm", weight: "22 kg" },
-        deliveryInfo: { leadTime: "White-glove scheduled delivery within 5 days", isFragile: false, whiteGloveRequired: true },
-        image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1200",
-        description: "One-of-a-kind sculptural accent table carved from preserved aged timber, celebrating natural organic forms."
-    },
-];
+
+
 
 interface ShopContentProps {
     initialProducts?: any[];
 }
 
 export default function ShopContent({ initialProducts = [] }: ShopContentProps) {
-    const hasInitial = initialProducts && initialProducts.length > 0;
-    const initialList = hasInitial ? initialProducts : FALLBACK_PRODUCTS;
-    const [products, setProducts] = useState<any[]>(initialList);
-    const [filteredProducts, setFilteredProducts] = useState<any[]>(initialList);
+    const [products, setProducts] = useState<any[]>(initialProducts);
+    const [filteredProducts, setFilteredProducts] = useState<any[]>(initialProducts);
     const [activeCategory, setActiveCategory] = useState("All");
-    const [loading, setLoading] = useState(!hasInitial);
+    const [loading] = useState(false);
     
     // Global Cart State
     const { totalCount: totalCartCount, addToCart, openCart } = useCart();
@@ -138,25 +27,6 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
     // Quick View modal state
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
     const [addedToast, setAddedToast] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (!hasInitial) {
-            async function fetchProducts() {
-                try {
-                    const data = await getShopProducts();
-                    if (data && data.length > 0) {
-                        setProducts(data);
-                        setFilteredProducts(data);
-                    }
-                } catch (e) {
-                    console.warn("Could not fetch products from backend", e);
-                } finally {
-                    setLoading(false);
-                }
-            }
-            fetchProducts();
-        }
-    }, [hasInitial]);
 
     useEffect(() => {
         if (activeCategory === "All") {
@@ -278,6 +148,36 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                 </div>
 
                 {/* Products Grid - 2 columns on Mobile, 2 on MD, 3 on LG */}
+                {filteredProducts.length === 0 ? (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="py-32 text-center space-y-6"
+                    >
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 border border-white/10 mb-2">
+                            <Package size={32} className="text-gold/60" />
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-2xl font-serif text-white">
+                                {activeCategory === "All" ? "No pieces available yet" : `No ${activeCategory} pieces yet`}
+                            </h2>
+                            <p className="text-white/50 text-sm max-w-sm mx-auto">
+                                {activeCategory === "All"
+                                    ? "New collection pieces will appear here as they are added to the catalog."
+                                    : `No pieces in the ${activeCategory} category yet. Try browsing all categories.`
+                                }
+                            </p>
+                        </div>
+                        {activeCategory !== "All" && (
+                            <button
+                                onClick={() => setActiveCategory("All")}
+                                className="inline-flex items-center gap-2 text-gold text-xs uppercase tracking-widest hover:underline"
+                            >
+                                <Sparkles size={12} /> View all categories
+                            </button>
+                        )}
+                    </motion.div>
+                ) : (
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
                     {filteredProducts.map((product, idx) => (
                         <motion.div
@@ -380,6 +280,7 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                         </motion.div>
                     ))}
                 </div>
+                )}
             </div>
 
             {/* Quick View / Product Detail Modal */}
