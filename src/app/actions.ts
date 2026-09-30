@@ -107,31 +107,24 @@ export async function getProjects() {
         return result.docs.map((doc: any) => {
             const mediaItems: { url: string; type: "image" | "video" }[] = [];
 
-            // Featured image (exists in DB)
+            // Featured image upload (DB column: featured_image_id)
             const fi = resolveUpload(doc.featuredImage);
-            if (fi) mediaItems.push({ url: fi.url, type: isVideoUrl(fi.url, fi.mimeType) ? "video" : "image" });
+            if (fi) mediaItems.push({ url: fi.url, type: "image" });
 
-            // Gallery array (original fields: image, url, type; new: videoFile)
+            // Gallery array (DB columns: image_id, url, type)
             if (Array.isArray(doc.media)) {
                 for (const m of doc.media) {
-                    // Try new videoFile upload first
-                    const vf = resolveUpload(m.videoFile);
-                    if (vf && !mediaItems.find(i => i.url === vf.url)) {
-                        mediaItems.push({ url: vf.url, type: "video" });
-                        continue;
-                    }
-                    // Then original image upload
                     const img = resolveUpload(m.image);
                     if (img && !mediaItems.find(i => i.url === img.url)) {
-                        const isVid = m.type === "video" || isVideoUrl(img.url, img.mimeType);
-                        mediaItems.push({ url: img.url, type: isVid ? "video" : "image" });
+                        const t: "image" | "video" = m.type === "video" ? "video" : "image";
+                        mediaItems.push({ url: img.url, type: t });
                         continue;
                     }
-                    // Then external URL
                     if (typeof m.url === "string" && m.url.trim()) {
                         const u = m.url.trim();
                         if (!mediaItems.find(i => i.url === u)) {
-                            mediaItems.push({ url: u, type: m.type === "video" || isVideoUrl(u) ? "video" : "image" });
+                            const t: "image" | "video" = m.type === "video" ? "video" : "image";
+                            mediaItems.push({ url: u, type: t });
                         }
                     }
                 }
@@ -164,25 +157,21 @@ export async function getProjectById(id: string) {
         const mediaItems: { url: string; type: "image" | "video" }[] = [];
 
         const fi = resolveUpload(doc.featuredImage);
-        if (fi) mediaItems.push({ url: fi.url, type: isVideoUrl(fi.url, fi.mimeType) ? "video" : "image" });
+        if (fi) mediaItems.push({ url: fi.url, type: "image" });
 
         if (Array.isArray(doc.media)) {
             for (const m of doc.media) {
-                const vf = resolveUpload(m.videoFile);
-                if (vf && !mediaItems.find(i => i.url === vf.url)) {
-                    mediaItems.push({ url: vf.url, type: "video" });
-                    continue;
-                }
                 const img = resolveUpload(m.image);
                 if (img && !mediaItems.find(i => i.url === img.url)) {
-                    const isVid = m.type === "video" || isVideoUrl(img.url, img.mimeType);
-                    mediaItems.push({ url: img.url, type: isVid ? "video" : "image" });
+                    const t: "image" | "video" = m.type === "video" ? "video" : "image";
+                    mediaItems.push({ url: img.url, type: t });
                     continue;
                 }
                 if (typeof m.url === "string" && m.url.trim()) {
                     const u = m.url.trim();
                     if (!mediaItems.find(i => i.url === u)) {
-                        mediaItems.push({ url: u, type: m.type === "video" || isVideoUrl(u) ? "video" : "image" });
+                        const t: "image" | "video" = m.type === "video" ? "video" : "image";
+                        mediaItems.push({ url: u, type: t });
                     }
                 }
             }
@@ -265,7 +254,7 @@ export async function createInquiry(data: {
     }
 }
 
-// Get all shop products with enhanced e-commerce fields
+// Get all shop products
 export async function getShopProducts() {
     try {
         const payload = await getPayloadClient();
@@ -288,49 +277,23 @@ export async function getShopProducts() {
                 ? doc.slug
                 : (doc.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-            let primaryImage = "";
-            if (typeof doc.imageMedia === "object" && doc.imageMedia?.url) {
-                primaryImage = doc.imageMedia.url;
-            } else if (typeof doc.image === "string" && doc.image.trim() !== "") {
-                primaryImage = doc.image.trim();
-            }
+            // Primary image: imageMedia upload (DB: image_media_id) OR legacy image text URL
+            const primaryImageUpload = resolveUpload(doc.imageMedia);
+            const primaryImage = primaryImageUpload?.url || (typeof doc.image === "string" ? doc.image.trim() : "");
 
+            // Gallery: imageMedia already included as primary image
+            // gallery array has DB columns: image_id (upload), caption (text)
             const galleryItems: { url: string; type: "image" | "video" }[] = [];
-
             if (primaryImage) {
-                galleryItems.push({
-                    url: primaryImage,
-                    type: isVideoUrl(primaryImage, doc.imageMedia?.mimeType) ? "video" : "image"
-                });
+                galleryItems.push({ url: primaryImage, type: "image" });
             }
-
-            if (typeof doc.videoMedia === "object" && doc.videoMedia?.url) {
-                const vUrl = doc.videoMedia.url;
-                if (!galleryItems.find(i => i.url === vUrl)) {
-                    galleryItems.push({ url: vUrl, type: "video" });
-                }
-            }
-
             if (Array.isArray(doc.gallery)) {
                 for (const g of doc.gallery) {
-                    // new videoFile field
-                    const vf = resolveUpload(g.videoFile);
-                    if (vf && !galleryItems.find(i => i.url === vf.url)) {
-                        galleryItems.push({ url: vf.url, type: "video" });
-                        continue;
-                    }
-                    // original image upload
                     const img = resolveUpload(g.image);
                     if (img && !galleryItems.find(i => i.url === img.url)) {
-                        galleryItems.push({ url: img.url, type: isVideoUrl(img.url, img.mimeType) ? "video" : "image" });
+                        galleryItems.push({ url: img.url, type: "image" });
                     }
                 }
-            }
-
-            // Fallback for primaryImage if gallery has items but primaryImage was blank
-            if (!primaryImage && galleryItems.length > 0) {
-                const firstImg = galleryItems.find(i => i.type === "image");
-                if (firstImg) primaryImage = firstImg.url;
             }
 
             return {
@@ -370,20 +333,15 @@ export async function getProductBySlug(slugOrId: string) {
     try {
         const payload = await getPayloadClient();
 
-        // Strategy 1: query by slug field first
         const bySlug = await payload.find({
             collection: "products",
             where: { slug: { equals: slugOrId } },
             limit: 1,
         });
 
-        // Strategy 2: if no slug match, try by numeric/string ID
         let doc: any = bySlug.docs?.[0];
         if (!doc) {
-            const all = await payload.find({
-                collection: "products",
-                limit: 200,
-            });
+            const all = await payload.find({ collection: "products", limit: 200 });
             doc = all.docs?.find((d: any) => {
                 const derived = (d as any).name?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
                 return String((d as any).id) === slugOrId || derived === slugOrId;
@@ -395,47 +353,20 @@ export async function getProductBySlug(slugOrId: string) {
             const currencySymbol = doc.currency === "NGN" ? "₦" : doc.currency === "EUR" ? "€" : doc.currency === "GBP" ? "£" : "$";
             const formattedPrice = `${currencySymbol}${rawPrice.toLocaleString()}`;
 
-            let primaryImage = "";
-            if (typeof doc.imageMedia === "object" && doc.imageMedia?.url) {
-                primaryImage = doc.imageMedia.url;
-            } else if (typeof doc.image === "string" && doc.image.trim() !== "") {
-                primaryImage = doc.image.trim();
-            }
+            const primaryImageUpload = resolveUpload(doc.imageMedia);
+            const primaryImage = primaryImageUpload?.url || (typeof doc.image === "string" ? doc.image.trim() : "");
 
+            // Gallery: primary image + gallery array items (existing DB columns only)
             const galleryItems: { url: string; type: "image" | "video" }[] = [];
-            if (primaryImage) {
-                galleryItems.push({
-                    url: primaryImage,
-                    type: isVideoUrl(primaryImage, doc.imageMedia?.mimeType) ? "video" : "image"
-                });
-            }
-
-            if (typeof doc.videoMedia === "object" && doc.videoMedia?.url) {
-                const vUrl = doc.videoMedia.url;
-                if (!galleryItems.find(i => i.url === vUrl)) {
-                    galleryItems.push({ url: vUrl, type: "video" });
-                }
-            }
+            if (primaryImage) galleryItems.push({ url: primaryImage, type: "image" });
 
             if (Array.isArray(doc.gallery)) {
                 for (const g of doc.gallery) {
-                    // new videoFile field
-                    const vf = resolveUpload(g.videoFile);
-                    if (vf && !galleryItems.find(i => i.url === vf.url)) {
-                        galleryItems.push({ url: vf.url, type: "video" });
-                        continue;
-                    }
-                    // original image upload
                     const img = resolveUpload(g.image);
                     if (img && !galleryItems.find(i => i.url === img.url)) {
-                        galleryItems.push({ url: img.url, type: isVideoUrl(img.url, img.mimeType) ? "video" : "image" });
+                        galleryItems.push({ url: img.url, type: "image" });
                     }
                 }
-            }
-
-            if (!primaryImage && galleryItems.length > 0) {
-                const firstImg = galleryItems.find(i => i.type === "image");
-                if (firstImg) primaryImage = firstImg.url;
             }
 
             const slug = doc.slug && doc.slug.trim() !== ""

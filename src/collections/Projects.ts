@@ -44,27 +44,23 @@ export const Projects: CollectionConfig = {
     {
       name: 'media',
       type: 'array',
-      label: 'Project Gallery (Images & Videos)',
+      label: 'Project Gallery Media',
       admin: {
-        description: 'Add project photos and walkthrough videos.',
+        description: 'Add project photos. Use the Type field to mark videos by URL.',
       },
       fields: [
-        // Original fields — already exist in the DB.
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
           label: 'Image File',
-          admin: {
-            description: 'Upload a project photo.',
-          },
         },
         {
           name: 'url',
           type: 'text',
           label: 'External URL (optional)',
           admin: {
-            description: 'Direct image or video URL from an external source.',
+            description: 'Direct image or video URL',
           },
         },
         {
@@ -76,16 +72,6 @@ export const Projects: CollectionConfig = {
             { label: 'Image', value: 'image' },
             { label: 'Video', value: 'video' },
           ],
-        },
-        // New field — push:true will add this column to the DB.
-        {
-          name: 'videoFile',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Video File (optional)',
-          admin: {
-            description: 'Upload an MP4/MOV video for this project.',
-          },
         },
       ],
     },

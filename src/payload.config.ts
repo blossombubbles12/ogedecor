@@ -54,7 +54,6 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || process.env.DATABASE_URL || '',
     },
-    push: true,
   }),
   plugins: [
     vercelBlobStorage({

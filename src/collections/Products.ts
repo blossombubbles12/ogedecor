@@ -205,7 +205,6 @@ export const Products: CollectionConfig = {
         },
       ],
     },
-    // ─── Primary Media ──────────────────────────────────────────────────────────
     {
       name: 'imageMedia',
       type: 'upload',
@@ -215,46 +214,19 @@ export const Products: CollectionConfig = {
         description: 'Main product image shown on the shop listing and product page.',
       },
     },
-    // NOTE: videoMedia is a NEW column. Payload push:true will add it to Postgres automatically.
-    {
-      name: 'videoMedia',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Product Video (optional)',
-      admin: {
-        description: 'Upload an MP4 or MOV product video. It will appear in the gallery alongside images.',
-      },
-    },
-    // ─── Gallery ────────────────────────────────────────────────────────────────
-    // The gallery array uses the original `image` + `caption` sub-fields (already in DB).
-    // We also added `mediaType` and `video` as new columns via push:true.
     {
       name: 'gallery',
       type: 'array',
-      label: 'Additional Gallery (Images & Videos)',
+      label: 'Additional Gallery Images',
       admin: {
-        description: 'Add extra photos or walkthrough videos. Use "Primary Image" for photos, "Video File" for videos.',
+        description: 'Upload extra product photos. Video upload will be added soon.',
       },
       fields: [
-        // Original field — already exists in the DB.
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Image File',
-          admin: {
-            description: 'Upload a product photo.',
-          },
-        },
-        // New fields — push:true adds these columns to the DB.
-        {
-          name: 'videoFile',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Video File (optional)',
-          admin: {
-            description: 'Upload an MP4/MOV video instead of or alongside an image.',
-          },
+          label: 'Gallery Image',
         },
         {
           name: 'caption',
@@ -263,7 +235,6 @@ export const Products: CollectionConfig = {
         },
       ],
     },
-    // ─── Legacy URL fallback ─────────────────────────────────────────────────────
     {
       name: 'image',
       type: 'text',
