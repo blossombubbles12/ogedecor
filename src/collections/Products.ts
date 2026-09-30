@@ -221,7 +221,6 @@ export const Products: CollectionConfig = {
       label: 'Product Video (optional)',
       admin: {
         description: 'Upload an MP4/MOV product video. It will appear in the gallery after the images.',
-        condition: () => true,
       },
     },
     {
@@ -229,7 +228,7 @@ export const Products: CollectionConfig = {
       type: 'array',
       label: 'Additional Gallery (Images & Videos)',
       admin: {
-        description: 'Add extra angles or walkthrough videos. For each item choose whether it is an image or a video.',
+        description: 'Add extra images or walkthrough videos for this product.',
       },
       fields: [
         {
@@ -243,23 +242,38 @@ export const Products: CollectionConfig = {
           ],
         },
         {
+          name: 'media',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Media File (Image or Video)',
+          admin: {
+            description: 'Upload an image or video file from the Media library.',
+          },
+        },
+        {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Image File',
+          label: 'Legacy Image Upload',
           admin: {
-            condition: (_, siblingData) => siblingData?.mediaType !== 'video',
-            description: 'Upload an image file.',
+            hidden: true,
           },
         },
         {
           name: 'video',
           type: 'upload',
           relationTo: 'media',
-          label: 'Video File',
+          label: 'Legacy Video Upload',
           admin: {
-            condition: (_, siblingData) => siblingData?.mediaType === 'video',
-            description: 'Upload an MP4/MOV video file.',
+            hidden: true,
+          },
+        },
+        {
+          name: 'url',
+          type: 'text',
+          label: 'External URL (optional)',
+          admin: {
+            description: 'Direct URL to an external image or video file.',
           },
         },
         {

@@ -68,6 +68,20 @@ export async function createProject(data: {
     }
 }
 
+// Helper to determine if a URL points to a video
+function isVideoUrl(url: string | undefined | null, mimeType?: string): boolean {
+    if (!url) return false;
+    if (mimeType && mimeType.startsWith("video/")) return true;
+    const lower = url.toLowerCase().split('?')[0];
+    return (
+        lower.endsWith(".mp4") ||
+        lower.endsWith(".mov") ||
+        lower.endsWith(".webm") ||
+        lower.endsWith(".mkv") ||
+        lower.includes("/video/")
+    );
+}
+
 // Get all projects with fallback for pending DB credentials
 export async function getProjects() {
     try {
@@ -82,24 +96,57 @@ export async function getProjects() {
             return [];
         }
 
-        return result.docs.map((doc: any) => ({
-            id: String(doc.id),
-            title: doc.title,
-            description: doc.description,
-            category: doc.category,
-            completionDate: doc.completionDate,
-            media: (doc.media || []).map((m: any) => {
-                // New schema: mediaType + image/video upload fields
-                if (m.mediaType === "video") {
-                    const url = typeof m.video === "object" && m.video?.url ? m.video.url : m.url || "";
-                    return { url, type: "video" as const };
-                }
-                const url = typeof m.image === "object" && m.image?.url ? m.image.url : m.url || "";
-                return { url, type: (m.type || "image") as "image" | "video" };
-            }).filter((m: any) => m.url),
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt,
-        }));
+        return result.docs.map((doc: any) => {
+            const mediaItems: { url: string; type: "image" | "video" }[] = [];
+
+            // Add featured image if present
+            if (typeof doc.featuredImage === "object" && doc.featuredImage?.url) {
+                const fUrl = doc.featuredImage.url;
+                mediaItems.push({
+                    url: fUrl,
+                    type: isVideoUrl(fUrl, doc.featuredImage?.mimeType) ? "video" : "image",
+                });
+            }
+
+            // Add media gallery items
+            if (Array.isArray(doc.media)) {
+                doc.media.forEach((m: any) => {
+                    let itemUrl = "";
+                    let itemMime = "";
+                    let isExplicitVideo = m.mediaType === "video" || m.type === "video";
+
+                    if (typeof m.media === "object" && m.media?.url) {
+                        itemUrl = m.media.url;
+                        itemMime = m.media.mimeType || "";
+                    } else if (typeof m.video === "object" && m.video?.url) {
+                        itemUrl = m.video.url;
+                        itemMime = m.video.mimeType || "";
+                        isExplicitVideo = true;
+                    } else if (typeof m.image === "object" && m.image?.url) {
+                        itemUrl = m.image.url;
+                        itemMime = m.image.mimeType || "";
+                    } else if (typeof m.url === "string" && m.url.trim() !== "") {
+                        itemUrl = m.url.trim();
+                    }
+
+                    if (itemUrl && !mediaItems.find(i => i.url === itemUrl)) {
+                        const type = isExplicitVideo || isVideoUrl(itemUrl, itemMime) ? "video" : "image";
+                        mediaItems.push({ url: itemUrl, type });
+                    }
+                });
+            }
+
+            return {
+                id: String(doc.id),
+                title: doc.title,
+                description: doc.description,
+                category: doc.category,
+                completionDate: doc.completionDate,
+                media: mediaItems,
+                createdAt: doc.createdAt,
+                updatedAt: doc.updatedAt,
+            };
+        });
     } catch (error) {
         console.warn("Could not fetch projects via Payload CMS (DB credentials pending or connecting):", error);
         return [];
@@ -117,20 +164,50 @@ export async function getProjectById(id: string) {
 
         if (!doc) return null;
 
+        const mediaItems: { url: string; type: "image" | "video" }[] = [];
+
+        if (typeof doc.featuredImage === "object" && doc.featuredImage?.url) {
+            const fUrl = doc.featuredImage.url;
+            mediaItems.push({
+                url: fUrl,
+                type: isVideoUrl(fUrl, doc.featuredImage?.mimeType) ? "video" : "image",
+            });
+        }
+
+        if (Array.isArray(doc.media)) {
+            doc.media.forEach((m: any) => {
+                let itemUrl = "";
+                let itemMime = "";
+                let isExplicitVideo = m.mediaType === "video" || m.type === "video";
+
+                if (typeof m.media === "object" && m.media?.url) {
+                    itemUrl = m.media.url;
+                    itemMime = m.media.mimeType || "";
+                } else if (typeof m.video === "object" && m.video?.url) {
+                    itemUrl = m.video.url;
+                    itemMime = m.video.mimeType || "";
+                    isExplicitVideo = true;
+                } else if (typeof m.image === "object" && m.image?.url) {
+                    itemUrl = m.image.url;
+                    itemMime = m.image.mimeType || "";
+                } else if (typeof m.url === "string" && m.url.trim() !== "") {
+                    itemUrl = m.url.trim();
+                }
+
+                if (itemUrl && !mediaItems.find(i => i.url === itemUrl)) {
+                    const type = isExplicitVideo || isVideoUrl(itemUrl, itemMime) ? "video" : "image";
+                    mediaItems.push({ url: itemUrl, type });
+                }
+            });
+        }
+
         return {
             id: String(doc.id),
             title: doc.title,
             description: doc.description,
             category: doc.category,
             completionDate: doc.completionDate,
-            media: (doc.media || []).map((m: any) => {
-                if (m.mediaType === "video") {
-                    const url = typeof m.video === "object" && m.video?.url ? m.video.url : m.url || "";
-                    return { url, type: "video" as const };
-                }
-                const url = typeof m.image === "object" && m.image?.url ? m.image.url : m.url || "";
-                return { url, type: (m.type || "image") as "image" | "video" };
-            }).filter((m: any) => m.url),
+            media: mediaItems,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt,
         };
@@ -219,14 +296,70 @@ export async function getShopProducts() {
             const rawPrice = typeof doc.price === "number" ? doc.price : parseFloat(String(doc.price).replace(/[^0-9.]/g, "")) || 0;
             const currencySymbol = doc.currency === "NGN" ? "₦" : doc.currency === "EUR" ? "€" : doc.currency === "GBP" ? "£" : "$";
             const formattedPrice = `${currencySymbol}${rawPrice.toLocaleString()}`;
-            // Always generate a slug from name if the slug field was left blank in admin
+
             const slug = doc.slug && doc.slug.trim() !== ""
                 ? doc.slug
-                : doc.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                : (doc.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+            let primaryImage = "";
+            if (typeof doc.imageMedia === "object" && doc.imageMedia?.url) {
+                primaryImage = doc.imageMedia.url;
+            } else if (typeof doc.image === "string" && doc.image.trim() !== "") {
+                primaryImage = doc.image.trim();
+            }
+
+            const galleryItems: { url: string; type: "image" | "video" }[] = [];
+
+            if (primaryImage) {
+                galleryItems.push({
+                    url: primaryImage,
+                    type: isVideoUrl(primaryImage, doc.imageMedia?.mimeType) ? "video" : "image"
+                });
+            }
+
+            if (typeof doc.videoMedia === "object" && doc.videoMedia?.url) {
+                const vUrl = doc.videoMedia.url;
+                if (!galleryItems.find(i => i.url === vUrl)) {
+                    galleryItems.push({ url: vUrl, type: "video" });
+                }
+            }
+
+            if (Array.isArray(doc.gallery)) {
+                doc.gallery.forEach((g: any) => {
+                    let itemUrl = "";
+                    let itemMime = "";
+                    let isExplicitVideo = g.mediaType === "video" || g.type === "video";
+
+                    if (typeof g.media === "object" && g.media?.url) {
+                        itemUrl = g.media.url;
+                        itemMime = g.media.mimeType || "";
+                    } else if (typeof g.video === "object" && g.video?.url) {
+                        itemUrl = g.video.url;
+                        itemMime = g.video.mimeType || "";
+                        isExplicitVideo = true;
+                    } else if (typeof g.image === "object" && g.image?.url) {
+                        itemUrl = g.image.url;
+                        itemMime = g.image.mimeType || "";
+                    } else if (typeof g.url === "string" && g.url.trim() !== "") {
+                        itemUrl = g.url.trim();
+                    }
+
+                    if (itemUrl && !galleryItems.find(i => i.url === itemUrl)) {
+                        const type = isExplicitVideo || isVideoUrl(itemUrl, itemMime) ? "video" : "image";
+                        galleryItems.push({ url: itemUrl, type });
+                    }
+                });
+            }
+
+            // Fallback for primaryImage if gallery has items but primaryImage was blank
+            if (!primaryImage && galleryItems.length > 0) {
+                const firstImg = galleryItems.find(i => i.type === "image");
+                if (firstImg) primaryImage = firstImg.url;
+            }
 
             return {
                 id: String(doc.id),
-                name: doc.name,
+                name: doc.name || "Bespoke Piece",
                 slug,
                 subtitle: doc.subtitle || "",
                 description: doc.description || "",
@@ -245,29 +378,8 @@ export async function getShopProducts() {
                     isFragile: Boolean(doc.deliveryInfo?.isFragile),
                     whiteGloveRequired: Boolean(doc.deliveryInfo?.whiteGloveRequired),
                 },
-                image: typeof doc.imageMedia === "object" && doc.imageMedia?.url 
-                    ? doc.imageMedia.url 
-                    : doc.image || "",
-                // gallery items as {url, type} so frontend can render video vs image
-                gallery: (() => {
-                    const items: { url: string; type: "image" | "video" }[] = [];
-                    if (Array.isArray(doc.gallery)) {
-                        doc.gallery.forEach((g: any) => {
-                            if (g.mediaType === "video") {
-                                const url = typeof g.video === "object" ? g.video?.url : null;
-                                if (url) items.push({ url, type: "video" });
-                            } else {
-                                const url = typeof g.image === "object" ? g.image?.url : g.url;
-                                if (url) items.push({ url, type: "image" });
-                            }
-                        });
-                    }
-                    // Append top-level videoMedia if present
-                    if (typeof doc.videoMedia === "object" && doc.videoMedia?.url) {
-                        items.push({ url: doc.videoMedia.url, type: "video" });
-                    }
-                    return items;
-                })(),
+                image: primaryImage,
+                gallery: galleryItems,
                 createdAt: doc.createdAt,
             };
         });
@@ -276,7 +388,6 @@ export async function getShopProducts() {
         return [];
     }
 }
-
 
 // Fetch single product by slug or id with rich details
 export async function getProductBySlug(slugOrId: string) {
@@ -293,7 +404,6 @@ export async function getProductBySlug(slugOrId: string) {
         // Strategy 2: if no slug match, try by numeric/string ID
         let doc: any = bySlug.docs?.[0];
         if (!doc) {
-            // Also try matching products whose name-derived slug equals slugOrId
             const all = await payload.find({
                 collection: "products",
                 limit: 200,
@@ -309,28 +419,58 @@ export async function getProductBySlug(slugOrId: string) {
             const currencySymbol = doc.currency === "NGN" ? "₦" : doc.currency === "EUR" ? "€" : doc.currency === "GBP" ? "£" : "$";
             const formattedPrice = `${currencySymbol}${rawPrice.toLocaleString()}`;
 
-            const primaryImage = typeof doc.imageMedia === "object" && doc.imageMedia?.url 
-                ? doc.imageMedia.url 
-                : doc.image || "";
+            let primaryImage = "";
+            if (typeof doc.imageMedia === "object" && doc.imageMedia?.url) {
+                primaryImage = doc.imageMedia.url;
+            } else if (typeof doc.image === "string" && doc.image.trim() !== "") {
+                primaryImage = doc.image.trim();
+            }
 
-            // Build gallery as rich {url, type} items
             const galleryItems: { url: string; type: "image" | "video" }[] = [];
-            if (primaryImage) galleryItems.push({ url: primaryImage, type: "image" });
+            if (primaryImage) {
+                galleryItems.push({
+                    url: primaryImage,
+                    type: isVideoUrl(primaryImage, doc.imageMedia?.mimeType) ? "video" : "image"
+                });
+            }
+
+            if (typeof doc.videoMedia === "object" && doc.videoMedia?.url) {
+                const vUrl = doc.videoMedia.url;
+                if (!galleryItems.find(i => i.url === vUrl)) {
+                    galleryItems.push({ url: vUrl, type: "video" });
+                }
+            }
+
             if (Array.isArray(doc.gallery)) {
                 doc.gallery.forEach((g: any) => {
-                    if (g.mediaType === "video") {
-                        const url = typeof g.video === "object" ? g.video?.url : null;
-                        if (url && !galleryItems.find(i => i.url === url)) galleryItems.push({ url, type: "video" });
-                    } else {
-                        const url = typeof g.image === "object" ? g.image?.url : g.url;
-                        if (url && !galleryItems.find(i => i.url === url)) galleryItems.push({ url, type: "image" });
+                    let itemUrl = "";
+                    let itemMime = "";
+                    let isExplicitVideo = g.mediaType === "video" || g.type === "video";
+
+                    if (typeof g.media === "object" && g.media?.url) {
+                        itemUrl = g.media.url;
+                        itemMime = g.media.mimeType || "";
+                    } else if (typeof g.video === "object" && g.video?.url) {
+                        itemUrl = g.video.url;
+                        itemMime = g.video.mimeType || "";
+                        isExplicitVideo = true;
+                    } else if (typeof g.image === "object" && g.image?.url) {
+                        itemUrl = g.image.url;
+                        itemMime = g.image.mimeType || "";
+                    } else if (typeof g.url === "string" && g.url.trim() !== "") {
+                        itemUrl = g.url.trim();
+                    }
+
+                    if (itemUrl && !galleryItems.find(i => i.url === itemUrl)) {
+                        const type = isExplicitVideo || isVideoUrl(itemUrl, itemMime) ? "video" : "image";
+                        galleryItems.push({ url: itemUrl, type });
                     }
                 });
             }
-            // Append top-level videoMedia if present
-            if (typeof doc.videoMedia === "object" && doc.videoMedia?.url) {
-                const vUrl = doc.videoMedia.url;
-                if (!galleryItems.find(i => i.url === vUrl)) galleryItems.push({ url: vUrl, type: "video" });
+
+            if (!primaryImage && galleryItems.length > 0) {
+                const firstImg = galleryItems.find(i => i.type === "image");
+                if (firstImg) primaryImage = firstImg.url;
             }
 
             const slug = doc.slug && doc.slug.trim() !== ""

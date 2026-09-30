@@ -60,23 +60,30 @@ export const Projects: CollectionConfig = {
           ],
         },
         {
+          name: 'media',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Media File (Image or Video)',
+          admin: {
+            description: 'Upload an image or video file.',
+          },
+        },
+        {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Image File',
+          label: 'Legacy Image File',
           admin: {
-            condition: (_, siblingData) => siblingData?.mediaType !== 'video',
-            description: 'Upload a project image.',
+            hidden: true,
           },
         },
         {
           name: 'video',
           type: 'upload',
           relationTo: 'media',
-          label: 'Video File',
+          label: 'Legacy Video File',
           admin: {
-            condition: (_, siblingData) => siblingData?.mediaType === 'video',
-            description: 'Upload an MP4/MOV walkthrough video.',
+            hidden: true,
           },
         },
         {
@@ -93,7 +100,7 @@ export const Projects: CollectionConfig = {
           defaultValue: 'image',
           label: 'Legacy Type Tag',
           admin: {
-            condition: () => false, // hidden — kept for backwards compatibility
+            hidden: true,
           },
           options: [
             { label: 'Image', value: 'image' },
