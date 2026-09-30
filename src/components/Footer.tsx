@@ -24,7 +24,7 @@ export default function Footer() {
                             <li><Link href="/about" className="hover:text-gold transition-colors">About Ogechi</Link></li>
                             <li><Link href="/projects" className="hover:text-gold transition-colors">Portfolio</Link></li>
                             <li><Link href="/services" className="hover:text-gold transition-colors">Services</Link></li>
-                            <li><Link href="/shop" className="hover:text-gold transition-colors">Collection</Link></li>
+                            <li><Link href="/shop" className="hover:text-gold transition-colors">Shop</Link></li>
                         </ul>
                     </div>
 

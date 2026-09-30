@@ -61,19 +61,30 @@ interface ProductDetailProps {
 export default function ProductDetailClient({ product, relatedProducts }: ProductDetailProps) {
     const { addToCart, openCart, openCheckout } = useCart();
 
+    const isVideoString = (url?: string) => {
+        if (!url) return false;
+        const u = url.toLowerCase().split('?')[0];
+        return u.endsWith('.mp4') || u.endsWith('.webm') || u.endsWith('.mov') || u.includes('/video/');
+    };
+
     // Normalise gallery to {url, type} items — supports both legacy string[] and new {url,type}[] formats
     const rawGallery: (string | GalleryItem)[] = product.gallery && product.gallery.length > 0
         ? product.gallery
-        : [{ url: product.image, type: "image" as const }];
-    const galleryItems: GalleryItem[] = rawGallery.map((g) =>
-        typeof g === "string" ? { url: g, type: "image" as const } : g
-    );
+        : [{ url: product.image, type: isVideoString(product.image) ? ("video" as const) : ("image" as const) }];
+    const galleryItems: GalleryItem[] = rawGallery.map((g) => {
+        if (typeof g === "string") {
+            return { url: g, type: isVideoString(g) ? ("video" as const) : ("image" as const) };
+        }
+        return g;
+    });
     // Ensure primary image is first if not already present
     if (product.image && !galleryItems.find(g => g.url === product.image)) {
-        galleryItems.unshift({ url: product.image, type: "image" });
+        galleryItems.unshift({ url: product.image, type: isVideoString(product.image) ? "video" : "image" });
     }
 
-    const [selectedItem, setSelectedItem] = useState<GalleryItem>(galleryItems[0] ?? { url: product.image, type: "image" });
+    const [selectedItem, setSelectedItem] = useState<GalleryItem>(
+        galleryItems[0] ?? { url: product.image, type: isVideoString(product.image) ? "video" : "image" }
+    );
     const [lightboxOpen, setLightboxOpen] = useState(false);
     
     // Order quantity state
