@@ -228,7 +228,7 @@ export const Products: CollectionConfig = {
       type: 'array',
       label: 'Additional Gallery (Images & Videos)',
       admin: {
-        description: 'Add extra images or walkthrough videos for this product.',
+        description: 'Add extra photos or walkthrough videos for this product.',
       },
       fields: [
         {
@@ -242,30 +242,21 @@ export const Products: CollectionConfig = {
           ],
         },
         {
-          name: 'media',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Media File (Image or Video)',
-          admin: {
-            description: 'Upload an image or video file from the Media library.',
-          },
-        },
-        {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Legacy Image Upload',
+          label: 'Image / Video File',
           admin: {
-            hidden: true,
+            description: 'Upload an image or video file from the Media library.',
           },
         },
         {
           name: 'video',
           type: 'upload',
           relationTo: 'media',
-          label: 'Legacy Video Upload',
+          label: 'Video File (optional)',
           admin: {
-            hidden: true,
+            description: 'Alternative upload slot for video files.',
           },
         },
         {

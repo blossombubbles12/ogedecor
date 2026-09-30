@@ -60,30 +60,21 @@ export const Projects: CollectionConfig = {
           ],
         },
         {
-          name: 'media',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Media File (Image or Video)',
-          admin: {
-            description: 'Upload an image or video file.',
-          },
-        },
-        {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Legacy Image File',
+          label: 'Image / Video File',
           admin: {
-            hidden: true,
+            description: 'Upload a project photo or video file.',
           },
         },
         {
           name: 'video',
           type: 'upload',
           relationTo: 'media',
-          label: 'Legacy Video File',
+          label: 'Video File (optional)',
           admin: {
-            hidden: true,
+            description: 'Upload an MP4/MOV walkthrough video.',
           },
         },
         {
