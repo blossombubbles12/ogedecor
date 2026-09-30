@@ -7,45 +7,6 @@ import { useEffect, useState } from "react";
 import { getShopProducts } from "@/app/actions";
 import { useCart } from "@/context/CartContext";
 
-const MOCK_PRODUCTS = [
-    {
-        id: "p1",
-        slug: "ashanti-stool-gold-edition",
-        name: "Ashanti Stool - Gold Edition",
-        price: 450,
-        formattedPrice: "$450.00",
-        currency: "USD",
-        image: "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=800&auto=format&fit=crop"
-    },
-    {
-        id: "p2",
-        slug: "wakandan-geometry-vase",
-        name: "Wakandan Geometry Vase",
-        price: 180,
-        formattedPrice: "$180.00",
-        currency: "USD",
-        image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?q=80&w=800&auto=format&fit=crop"
-    },
-    {
-        id: "p3",
-        slug: "savanna-velvet-cushion",
-        name: "Savanna Velvet Cushion",
-        price: 95,
-        formattedPrice: "$95.00",
-        currency: "USD",
-        image: "https://images.unsplash.com/photo-1584100936555-5c911b6d0590?q=80&w=800&auto=format&fit=crop"
-    },
-    {
-        id: "p4",
-        slug: "kalahari-onyx-sconce",
-        name: "Kalahari Onyx Sconce",
-        price: 340,
-        formattedPrice: "$340.00",
-        currency: "USD",
-        image: "https://images.unsplash.com/photo-1507473885765-e6ed60516b12?q=80&w=800&auto=format&fit=crop"
-    }
-];
-
 export default function ShopPreview() {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -55,13 +16,9 @@ export default function ShopPreview() {
         const fetchProducts = async () => {
             try {
                 const data = await getShopProducts();
-                if (data && data.length > 0) {
-                    setProducts(data.slice(0, 4));
-                } else {
-                    setProducts(MOCK_PRODUCTS);
-                }
+                setProducts(data ? data.slice(0, 4) : []);
             } catch {
-                setProducts(MOCK_PRODUCTS);
+                setProducts([]);
             } finally {
                 setLoading(false);
             }
@@ -90,13 +47,20 @@ export default function ShopPreview() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
-                    {loading ? (
-                        [1, 2, 3, 4].map((i) => (
+                {loading ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
+                        {[1, 2, 3, 4].map((i) => (
                             <div key={i} className="aspect-square sm:aspect-[4/5] bg-white/5 animate-pulse rounded-lg sm:rounded-xl" />
-                        ))
-                    ) : (
-                        products.map((product, index) => (
+                        ))}
+                    </div>
+                ) : products.length === 0 ? (
+                    <div className="py-16 text-center space-y-4">
+                        <p className="text-white/40 text-sm">New collection pieces will appear here once added to the catalog.</p>
+                        <Link href="/shop" className="inline-block text-gold text-xs uppercase tracking-widest hover:underline">Visit the full store →</Link>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
+                        {products.map((product, index) => (
                             <motion.div
                                 key={product.id}
                                 initial={{ opacity: 0, scale: 0.95 }}
@@ -138,9 +102,9 @@ export default function ShopPreview() {
                                     </span>
                                 </div>
                             </motion.div>
-                        ))
-                    )}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );

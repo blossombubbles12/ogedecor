@@ -46,35 +46,17 @@ export const Projects: CollectionConfig = {
       type: 'array',
       label: 'Project Gallery (Images & Videos)',
       admin: {
-        description: 'Add project photos and walkthrough videos. Select the media type for each item.',
+        description: 'Add project photos and walkthrough videos.',
       },
       fields: [
-        {
-          name: 'mediaType',
-          type: 'select',
-          label: 'Media Type',
-          defaultValue: 'image',
-          options: [
-            { label: 'Image', value: 'image' },
-            { label: 'Video', value: 'video' },
-          ],
-        },
+        // Original fields — already exist in the DB.
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Image / Video File',
+          label: 'Image File',
           admin: {
-            description: 'Upload a project photo or video file.',
-          },
-        },
-        {
-          name: 'video',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Video File (optional)',
-          admin: {
-            description: 'Upload an MP4/MOV walkthrough video.',
+            description: 'Upload a project photo.',
           },
         },
         {
@@ -82,21 +64,28 @@ export const Projects: CollectionConfig = {
           type: 'text',
           label: 'External URL (optional)',
           admin: {
-            description: 'Alternatively paste a direct image or video URL from an external source.',
+            description: 'Direct image or video URL from an external source.',
           },
         },
         {
           name: 'type',
           type: 'select',
           defaultValue: 'image',
-          label: 'Legacy Type Tag',
-          admin: {
-            hidden: true,
-          },
+          label: 'Media Type',
           options: [
             { label: 'Image', value: 'image' },
             { label: 'Video', value: 'video' },
           ],
+        },
+        // New field — push:true will add this column to the DB.
+        {
+          name: 'videoFile',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Video File (optional)',
+          admin: {
+            description: 'Upload an MP4/MOV video for this project.',
+          },
         },
       ],
     },

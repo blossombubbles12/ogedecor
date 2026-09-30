@@ -205,6 +205,7 @@ export const Products: CollectionConfig = {
         },
       ],
     },
+    // ─── Primary Media ──────────────────────────────────────────────────────────
     {
       name: 'imageMedia',
       type: 'upload',
@@ -214,57 +215,45 @@ export const Products: CollectionConfig = {
         description: 'Main product image shown on the shop listing and product page.',
       },
     },
+    // NOTE: videoMedia is a NEW column. Payload push:true will add it to Postgres automatically.
     {
       name: 'videoMedia',
       type: 'upload',
       relationTo: 'media',
       label: 'Product Video (optional)',
       admin: {
-        description: 'Upload an MP4/MOV product video. It will appear in the gallery after the images.',
+        description: 'Upload an MP4 or MOV product video. It will appear in the gallery alongside images.',
       },
     },
+    // ─── Gallery ────────────────────────────────────────────────────────────────
+    // The gallery array uses the original `image` + `caption` sub-fields (already in DB).
+    // We also added `mediaType` and `video` as new columns via push:true.
     {
       name: 'gallery',
       type: 'array',
       label: 'Additional Gallery (Images & Videos)',
       admin: {
-        description: 'Add extra photos or walkthrough videos for this product.',
+        description: 'Add extra photos or walkthrough videos. Use "Primary Image" for photos, "Video File" for videos.',
       },
       fields: [
-        {
-          name: 'mediaType',
-          type: 'select',
-          label: 'Media Type',
-          defaultValue: 'image',
-          options: [
-            { label: 'Image', value: 'image' },
-            { label: 'Video', value: 'video' },
-          ],
-        },
+        // Original field — already exists in the DB.
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Image / Video File',
+          label: 'Image File',
           admin: {
-            description: 'Upload an image or video file from the Media library.',
+            description: 'Upload a product photo.',
           },
         },
+        // New fields — push:true adds these columns to the DB.
         {
-          name: 'video',
+          name: 'videoFile',
           type: 'upload',
           relationTo: 'media',
           label: 'Video File (optional)',
           admin: {
-            description: 'Alternative upload slot for video files.',
-          },
-        },
-        {
-          name: 'url',
-          type: 'text',
-          label: 'External URL (optional)',
-          admin: {
-            description: 'Direct URL to an external image or video file.',
+            description: 'Upload an MP4/MOV video instead of or alongside an image.',
           },
         },
         {
@@ -274,6 +263,7 @@ export const Products: CollectionConfig = {
         },
       ],
     },
+    // ─── Legacy URL fallback ─────────────────────────────────────────────────────
     {
       name: 'image',
       type: 'text',
