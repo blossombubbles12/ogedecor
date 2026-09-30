@@ -88,10 +88,15 @@ export async function getProjects() {
             description: doc.description,
             category: doc.category,
             completionDate: doc.completionDate,
-            media: (doc.media || []).map((m: any) => ({
-                url: typeof m.image === "object" && m.image?.url ? m.image.url : m.url || "",
-                type: m.type || "image",
-            })),
+            media: (doc.media || []).map((m: any) => {
+                // New schema: mediaType + image/video upload fields
+                if (m.mediaType === "video") {
+                    const url = typeof m.video === "object" && m.video?.url ? m.video.url : m.url || "";
+                    return { url, type: "video" as const };
+                }
+                const url = typeof m.image === "object" && m.image?.url ? m.image.url : m.url || "";
+                return { url, type: (m.type || "image") as "image" | "video" };
+            }).filter((m: any) => m.url),
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt,
         }));
@@ -118,10 +123,14 @@ export async function getProjectById(id: string) {
             description: doc.description,
             category: doc.category,
             completionDate: doc.completionDate,
-            media: (doc.media || []).map((m: any) => ({
-                url: typeof m.image === "object" && m.image?.url ? m.image.url : m.url || "",
-                type: m.type || "image",
-            })),
+            media: (doc.media || []).map((m: any) => {
+                if (m.mediaType === "video") {
+                    const url = typeof m.video === "object" && m.video?.url ? m.video.url : m.url || "";
+                    return { url, type: "video" as const };
+                }
+                const url = typeof m.image === "object" && m.image?.url ? m.image.url : m.url || "";
+                return { url, type: (m.type || "image") as "image" | "video" };
+            }).filter((m: any) => m.url),
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt,
         };
@@ -238,8 +247,27 @@ export async function getShopProducts() {
                 },
                 image: typeof doc.imageMedia === "object" && doc.imageMedia?.url 
                     ? doc.imageMedia.url 
-                    : doc.image || "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=1200",
-                gallery: Array.isArray(doc.gallery) ? doc.gallery.map((g: any) => typeof g.image === "object" ? g.image?.url : g.url).filter(Boolean) : [],
+                    : doc.image || "",
+                // gallery items as {url, type} so frontend can render video vs image
+                gallery: (() => {
+                    const items: { url: string; type: "image" | "video" }[] = [];
+                    if (Array.isArray(doc.gallery)) {
+                        doc.gallery.forEach((g: any) => {
+                            if (g.mediaType === "video") {
+                                const url = typeof g.video === "object" ? g.video?.url : null;
+                                if (url) items.push({ url, type: "video" });
+                            } else {
+                                const url = typeof g.image === "object" ? g.image?.url : g.url;
+                                if (url) items.push({ url, type: "image" });
+                            }
+                        });
+                    }
+                    // Append top-level videoMedia if present
+                    if (typeof doc.videoMedia === "object" && doc.videoMedia?.url) {
+                        items.push({ url: doc.videoMedia.url, type: "video" });
+                    }
+                    return items;
+                })(),
                 createdAt: doc.createdAt,
             };
         });
@@ -283,15 +311,26 @@ export async function getProductBySlug(slugOrId: string) {
 
             const primaryImage = typeof doc.imageMedia === "object" && doc.imageMedia?.url 
                 ? doc.imageMedia.url 
-                : doc.image || "https://images.unsplash.com/photo-1594056152367-285625fb4902?q=80&w=1200";
+                : doc.image || "";
 
-            const galleryUrls: string[] = [];
-            if (primaryImage) galleryUrls.push(primaryImage);
+            // Build gallery as rich {url, type} items
+            const galleryItems: { url: string; type: "image" | "video" }[] = [];
+            if (primaryImage) galleryItems.push({ url: primaryImage, type: "image" });
             if (Array.isArray(doc.gallery)) {
                 doc.gallery.forEach((g: any) => {
-                    const url = typeof g.image === "object" ? g.image?.url : g.url;
-                    if (url && !galleryUrls.includes(url)) galleryUrls.push(url);
+                    if (g.mediaType === "video") {
+                        const url = typeof g.video === "object" ? g.video?.url : null;
+                        if (url && !galleryItems.find(i => i.url === url)) galleryItems.push({ url, type: "video" });
+                    } else {
+                        const url = typeof g.image === "object" ? g.image?.url : g.url;
+                        if (url && !galleryItems.find(i => i.url === url)) galleryItems.push({ url, type: "image" });
+                    }
                 });
+            }
+            // Append top-level videoMedia if present
+            if (typeof doc.videoMedia === "object" && doc.videoMedia?.url) {
+                const vUrl = doc.videoMedia.url;
+                if (!galleryItems.find(i => i.url === vUrl)) galleryItems.push({ url: vUrl, type: "video" });
             }
 
             const slug = doc.slug && doc.slug.trim() !== ""
@@ -320,7 +359,7 @@ export async function getProductBySlug(slugOrId: string) {
                     whiteGloveRequired: Boolean(doc.deliveryInfo?.whiteGloveRequired),
                 },
                 image: primaryImage,
-                gallery: galleryUrls.length > 0 ? galleryUrls : [primaryImage],
+                gallery: galleryItems,
                 createdAt: doc.createdAt,
             };
         }

@@ -209,21 +209,63 @@ export const Products: CollectionConfig = {
       name: 'imageMedia',
       type: 'upload',
       relationTo: 'media',
-      label: 'Primary Display Image (Vercel Blob)',
+      label: 'Primary Display Image',
+      admin: {
+        description: 'Main product image shown on the shop listing and product page.',
+      },
+    },
+    {
+      name: 'videoMedia',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Product Video (optional)',
+      admin: {
+        description: 'Upload an MP4/MOV product video. It will appear in the gallery after the images.',
+        condition: () => true,
+      },
     },
     {
       name: 'gallery',
       type: 'array',
-      label: 'Additional Gallery Angles',
+      label: 'Additional Gallery (Images & Videos)',
+      admin: {
+        description: 'Add extra angles or walkthrough videos. For each item choose whether it is an image or a video.',
+      },
       fields: [
+        {
+          name: 'mediaType',
+          type: 'select',
+          label: 'Media Type',
+          defaultValue: 'image',
+          options: [
+            { label: 'Image', value: 'image' },
+            { label: 'Video', value: 'video' },
+          ],
+        },
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
+          label: 'Image File',
+          admin: {
+            condition: (_, siblingData) => siblingData?.mediaType !== 'video',
+            description: 'Upload an image file.',
+          },
+        },
+        {
+          name: 'video',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Video File',
+          admin: {
+            condition: (_, siblingData) => siblingData?.mediaType === 'video',
+            description: 'Upload an MP4/MOV video file.',
+          },
         },
         {
           name: 'caption',
           type: 'text',
+          label: 'Caption (optional)',
         },
       ],
     },

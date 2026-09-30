@@ -18,9 +18,12 @@ import {
     X,
     Clock,
     Ruler,
-    Award
+    Award,
+    Play
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+
+type GalleryItem = { url: string; type: "image" | "video" };
 
 interface ProductDetailProps {
     product: {
@@ -50,19 +53,27 @@ interface ProductDetailProps {
             whiteGloveRequired?: boolean;
         };
         image: string;
-        gallery?: string[];
+        gallery?: (string | GalleryItem)[];
     };
     relatedProducts: any[];
 }
 
 export default function ProductDetailClient({ product, relatedProducts }: ProductDetailProps) {
     const { addToCart, openCart, openCheckout } = useCart();
-    
-    // Gallery state
-    const galleryImages = product.gallery && product.gallery.length > 0 
-        ? product.gallery 
-        : [product.image];
-    const [selectedImage, setSelectedImage] = useState<string>(galleryImages[0]);
+
+    // Normalise gallery to {url, type} items — supports both legacy string[] and new {url,type}[] formats
+    const rawGallery: (string | GalleryItem)[] = product.gallery && product.gallery.length > 0
+        ? product.gallery
+        : [{ url: product.image, type: "image" as const }];
+    const galleryItems: GalleryItem[] = rawGallery.map((g) =>
+        typeof g === "string" ? { url: g, type: "image" as const } : g
+    );
+    // Ensure primary image is first if not already present
+    if (product.image && !galleryItems.find(g => g.url === product.image)) {
+        galleryItems.unshift({ url: product.image, type: "image" });
+    }
+
+    const [selectedItem, setSelectedItem] = useState<GalleryItem>(galleryItems[0] ?? { url: product.image, type: "image" });
     const [lightboxOpen, setLightboxOpen] = useState(false);
     
     // Order quantity state
@@ -148,17 +159,40 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                         {/* Main Stage Display */}
                         <div 
                             className="relative aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden bg-[#121216] border border-white/10 group cursor-zoom-in"
-                            onClick={() => setLightboxOpen(true)}
+                            onClick={() => !selectedItem.type || selectedItem.type === "image" ? setLightboxOpen(true) : undefined}
                         >
-                            <img
-                                src={selectedImage}
-                                alt={product.name}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
+                            {selectedItem.type === "video" ? (
+                                <video
+                                    key={selectedItem.url}
+                                    src={selectedItem.url}
+                                    controls
+                                    className="w-full h-full object-contain bg-black"
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            ) : (
+                                <>
+                                    <img
+                                        src={selectedItem.url}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
+                                    {/* Fullscreen Trigger */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setLightboxOpen(true);
+                                        }}
+                                        className="absolute bottom-4 right-4 p-2.5 bg-black/70 backdrop-blur-md rounded-full text-white/70 hover:text-gold hover:bg-black transition-all opacity-0 group-hover:opacity-100"
+                                        title="Expand View"
+                                    >
+                                        <Maximize2 size={16} />
+                                    </button>
+                                </>
+                            )}
 
-                            {/* Badge */}
-                            <div className="absolute top-4 left-4 flex gap-2">
+                            {/* Badges */}
+                            <div className="absolute top-4 left-4 flex gap-2 pointer-events-none">
                                 <span className="px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 text-[10px] tracking-widest uppercase font-medium rounded-full text-gold">
                                     {product.category}
                                 </span>
@@ -169,34 +203,31 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                                     </span>
                                 )}
                             </div>
-
-                            {/* Fullscreen Trigger */}
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setLightboxOpen(true);
-                                }}
-                                className="absolute bottom-4 right-4 p-2.5 bg-black/70 backdrop-blur-md rounded-full text-white/70 hover:text-gold hover:bg-black transition-all opacity-0 group-hover:opacity-100"
-                                title="Expand View"
-                            >
-                                <Maximize2 size={16} />
-                            </button>
                         </div>
 
                         {/* Thumbnail Angles */}
-                        {galleryImages.length > 1 && (
+                        {galleryItems.length > 1 && (
                             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-                                {galleryImages.map((img, idx) => (
+                                {galleryItems.map((item, idx) => (
                                     <button
                                         key={idx}
-                                        onClick={() => setSelectedImage(img)}
+                                        onClick={() => setSelectedItem(item)}
                                         className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${
-                                            selectedImage === img
+                                            selectedItem.url === item.url
                                                 ? "border-gold scale-95 shadow-md shadow-gold/20"
                                                 : "border-white/10 hover:border-white/40 opacity-70 hover:opacity-100"
                                         }`}
                                     >
-                                        <img src={img} alt={`${product.name} angle ${idx + 1}`} className="w-full h-full object-cover" />
+                                        {item.type === "video" ? (
+                                            <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
+                                                <Play size={22} className="text-gold" fill="currentColor" />
+                                            </div>
+                                        ) : (
+                                            <img src={item.url} alt={`${product.name} angle ${idx + 1}`} className="w-full h-full object-cover" />
+                                        )}
+                                        {item.type === "video" && (
+                                            <span className="absolute bottom-1 left-1 text-[8px] uppercase tracking-widest bg-gold text-obsidian px-1 rounded font-bold">Video</span>
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -443,9 +474,9 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                 )}
             </div>
 
-            {/* Lightbox Modal */}
+            {/* Lightbox Modal — only for images */}
             <AnimatePresence>
-                {lightboxOpen && (
+                {lightboxOpen && selectedItem.type !== "video" && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -460,7 +491,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                             <X size={28} />
                         </button>
                         <img
-                            src={selectedImage}
+                            src={selectedItem.url}
                             alt={product.name}
                             className="max-w-full max-h-[90vh] object-contain rounded-lg border border-white/10"
                             onClick={(e) => e.stopPropagation()}
