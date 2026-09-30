@@ -69,13 +69,13 @@ export default function ShopPreview() {
                                 viewport={{ once: true }}
                                 className="group flex flex-col"
                             >
-                                <div className="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-neutral-900 rounded-lg sm:rounded-xl mb-3 sm:mb-4 group/img">
-                                    <Link href={`/shop/${product.slug || product.id}`} className="block w-full h-full">
-                                        <div
-                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover/img:scale-105"
-                                            style={{ backgroundImage: `url(${product.image})` }}
+                                <div className="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-[#0c0c0f] rounded-lg sm:rounded-xl mb-3 sm:mb-4 group/img flex items-center justify-center p-3 sm:p-4">
+                                    <Link href={`/shop/${product.slug || product.id}`} className="block w-full h-full relative flex items-center justify-center">
+                                        <img
+                                            src={product.image || "/ogedecor.png"}
+                                            alt={product.name}
+                                            className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-500 group-hover/img:scale-105"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-50 group-hover/img:opacity-30 transition-opacity" />
                                     </Link>
 
                                     {/* Mobile Tap / Desktop Hover Quick Add Button */}

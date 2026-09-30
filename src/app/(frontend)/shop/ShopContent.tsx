@@ -412,15 +412,15 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                                             className="group bg-[#121216] border border-white/10 hover:border-gold/40 rounded-xl overflow-hidden transition-all duration-300 flex flex-col shadow-lg hover:shadow-2xl hover:shadow-gold/5"
                                         >
                                             {/* Product Thumbnail Section - Crisp, well-proportioned, clearly visible */}
-                                            <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0e0e11] group/img flex items-center justify-center">
-                                                <Link href={`/shop/${product.slug || product.id}`} className="block w-full h-full">
+                                            <div className="relative aspect-square sm:aspect-[4/3] w-full overflow-hidden bg-[#0c0c0f] group/img flex items-center justify-center p-3 sm:p-4">
+                                                <Link href={`/shop/${product.slug || product.id}`} className="block w-full h-full relative flex items-center justify-center">
                                                     {productIsVideo ? (
                                                         <video
                                                             src={product.image}
                                                             muted
                                                             playsInline
                                                             loop
-                                                            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                                                            className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-500 group-hover/img:scale-105"
                                                             onMouseEnter={(e) => e.currentTarget.play()}
                                                             onMouseLeave={(e) => e.currentTarget.pause()}
                                                         />
@@ -429,10 +429,9 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                                                             src={product.image || "/ogedecor.png"}
                                                             alt={product.name}
                                                             loading="lazy"
-                                                            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                                                            className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-500 group-hover/img:scale-105"
                                                         />
                                                     )}
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-40 group-hover/img:opacity-20 transition-opacity" />
                                                 </Link>
 
                                                 {/* Top Badges (Category & In-Stock) */}
@@ -695,18 +694,18 @@ export default function ShopContent({ initialProducts = [] }: ShopContentProps) 
                                 </button>
                             </div>
 
-                            <div className="aspect-video w-full rounded-xl overflow-hidden bg-neutral-900 border border-white/5">
+                            <div className="aspect-[4/3] sm:aspect-video w-full rounded-xl overflow-hidden bg-[#0c0c0f] border border-white/5 flex items-center justify-center p-3 sm:p-4">
                                 {isVideo(selectedProduct.image) ? (
                                     <video
                                         src={selectedProduct.image}
                                         controls
-                                        className="w-full h-full object-contain bg-black"
+                                        className="max-h-full max-w-full w-auto h-auto object-contain bg-black"
                                     />
                                 ) : (
                                     <img
                                         src={selectedProduct.image}
                                         alt={selectedProduct.name}
-                                        className="w-full h-full object-cover"
+                                        className="max-h-full max-w-full w-auto h-auto object-contain"
                                     />
                                 )}
                             </div>

@@ -169,7 +169,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                     <div className="lg:col-span-7 space-y-4">
                         {/* Main Stage Display */}
                         <div 
-                            className="relative aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden bg-[#121216] border border-white/10 group cursor-zoom-in"
+                            className="relative aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden bg-[#0c0c0f] border border-white/10 group cursor-zoom-in flex items-center justify-center p-3 sm:p-6"
                             onClick={() => !selectedItem.type || selectedItem.type === "image" ? setLightboxOpen(true) : undefined}
                         >
                             {selectedItem.type === "video" ? (
@@ -177,7 +177,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                                     key={selectedItem.url}
                                     src={selectedItem.url}
                                     controls
-                                    className="w-full h-full object-contain bg-black"
+                                    className="max-h-full max-w-full w-auto h-auto object-contain bg-black rounded-xl"
                                     onClick={(e) => e.stopPropagation()}
                                 />
                             ) : (
@@ -185,9 +185,8 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                                     <img
                                         src={selectedItem.url}
                                         alt={product.name}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-500 group-hover:scale-105"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
                                     {/* Fullscreen Trigger */}
                                     <button
                                         onClick={(e) => {
@@ -218,26 +217,26 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
                         {/* Thumbnail Angles */}
                         {galleryItems.length > 1 && (
-                            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+                            <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
                                 {galleryItems.map((item, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setSelectedItem(item)}
-                                        className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${
+                                        className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 bg-[#0c0c0f] flex items-center justify-center p-1.5 ${
                                             selectedItem.url === item.url
                                                 ? "border-gold scale-95 shadow-md shadow-gold/20"
                                                 : "border-white/10 hover:border-white/40 opacity-70 hover:opacity-100"
                                         }`}
                                     >
                                         {item.type === "video" ? (
-                                            <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
-                                                <Play size={22} className="text-gold" fill="currentColor" />
+                                            <div className="w-full h-full bg-neutral-900 flex items-center justify-center rounded-lg">
+                                                <Play size={18} className="text-gold" fill="currentColor" />
                                             </div>
                                         ) : (
-                                            <img src={item.url} alt={`${product.name} angle ${idx + 1}`} className="w-full h-full object-cover" />
+                                            <img src={item.url} alt={`${product.name} angle ${idx + 1}`} className="max-h-full max-w-full w-auto h-auto object-contain" />
                                         )}
                                         {item.type === "video" && (
-                                            <span className="absolute bottom-1 left-1 text-[8px] uppercase tracking-widest bg-gold text-obsidian px-1 rounded font-bold">Video</span>
+                                            <span className="absolute bottom-1 left-1 text-[7px] uppercase tracking-widest bg-gold text-obsidian px-1 rounded font-bold">Video</span>
                                         )}
                                     </button>
                                 ))}

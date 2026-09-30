@@ -4,7 +4,6 @@ import BrandStory from "@/components/BrandStory";
 import FeaturedProjects from "@/components/FeaturedProjects";
 import Services from "@/components/Services";
 import ShopPreview from "@/components/ShopPreview";
-import InspirationGallery from "@/components/InspirationGallery";
 import Testimonials from "@/components/Testimonials";
 
 export const metadata: Metadata = {
@@ -20,7 +19,6 @@ export default function Home() {
       <FeaturedProjects />
       <Services />
       <ShopPreview />
-      <InspirationGallery />
       <Testimonials />
     </div>
   );
