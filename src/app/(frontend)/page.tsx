@@ -16,9 +16,9 @@ export default function Home() {
     <div className="flex flex-col w-full overflow-x-hidden">
       <Hero />
       <BrandStory />
+      <ShopPreview />
       <FeaturedProjects />
       <Services />
-      <ShopPreview />
       <Testimonials />
     </div>
   );
