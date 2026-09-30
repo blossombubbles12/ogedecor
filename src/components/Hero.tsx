@@ -58,7 +58,7 @@ export default function Hero() {
 
     return (
         <section 
-            className="relative h-[92vh] sm:h-screen w-full overflow-hidden flex items-center justify-center bg-obsidian pt-16"
+            className="relative h-[88vh] sm:h-[94vh] min-h-[580px] w-full overflow-hidden flex items-center bg-[#0b0b0e] pt-14"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
@@ -66,103 +66,110 @@ export default function Hero() {
             <AnimatePresence mode="wait">
                 <motion.div
                     key={slide.id}
-                    initial={{ opacity: 0, scale: 1.05 }}
+                    initial={{ opacity: 0, scale: 1.04 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 1.2, ease: "easeInOut" }}
+                    exit={{ opacity: 0, scale: 0.99 }}
+                    transition={{ duration: 1, ease: "easeInOut" }}
                     className="absolute inset-0 z-0"
                 >
                     <div
-                        className="w-full h-full bg-cover bg-center"
+                        className="w-full h-full bg-cover bg-center md:bg-[center_right]"
                         style={{ backgroundImage: `url(${slide.image})` }}
                         role="img"
                         aria-label={slide.heading}
                     />
-                    {/* Multi-layered cinematic gradient overlays for perfect contrast */}
-                    <div className="absolute inset-0 bg-black/50" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-black/40 to-black/60" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/60" />
+
+                    {/* Gradient Overlay: Deep, rich shade on the left for maximum text contrast, transitioning to crystal-clear vivid photo on the right */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0e] via-[#0b0b0e]/80 md:via-[#0b0b0e]/65 to-transparent w-full md:w-[70%]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0e] via-transparent to-black/30" />
                 </motion.div>
             </AnimatePresence>
 
-            {/* Slide Content */}
-            <div className="relative z-20 container mx-auto px-4 sm:px-6 text-center max-w-5xl">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={slide.id}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="space-y-4 sm:space-y-6"
-                    >
-                        {/* Subtitle / Category Badge */}
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-gold/30 text-gold text-xs sm:text-sm font-medium tracking-[0.25em] uppercase">
-                            <Sparkles size={13} className="text-gold animate-pulse" />
-                            <span>{slide.subtitle}</span>
-                        </div>
+            {/* Left-Aligned Slide Content */}
+            <div className="relative z-20 container mx-auto px-5 sm:px-8 lg:px-12 flex items-center">
+                <div className="max-w-2xl text-left py-10">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={slide.id}
+                            initial={{ opacity: 0, x: -30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ duration: 0.7, ease: "easeOut" }}
+                            className="space-y-4 sm:space-y-6"
+                        >
+                            {/* Subtitle Badge */}
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121216]/80 backdrop-blur-md border border-gold/30 text-gold text-xs sm:text-sm font-medium tracking-[0.25em] uppercase shadow-lg">
+                                <Sparkles size={13} className="text-gold animate-pulse" />
+                                <span>{slide.subtitle}</span>
+                            </div>
 
-                        {/* Main Heading */}
-                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-sand leading-[1.1] tracking-tight whitespace-pre-line drop-shadow-2xl">
-                            {slide.heading}
-                        </h1>
+                            {/* Main Heading */}
+                            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-sand leading-[1.1] tracking-tight whitespace-pre-line drop-shadow-2xl">
+                                {slide.heading}
+                            </h1>
 
-                        {/* Description */}
-                        <p className="text-white/85 max-w-2xl mx-auto text-sm sm:text-base md:text-lg font-light leading-relaxed drop-shadow-md">
-                            {slide.description}
-                        </p>
+                            {/* Description */}
+                            <p className="text-white/85 text-xs sm:text-sm md:text-base font-light leading-relaxed max-w-xl drop-shadow-md">
+                                {slide.description}
+                            </p>
 
-                        {/* Call to Action Buttons */}
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 pt-2 sm:pt-4">
-                            <Link
-                                href={slide.primaryCta.href}
-                                className="w-full sm:w-auto group relative px-7 py-3.5 bg-gold text-obsidian font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-gold-light transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-2"
-                            >
-                                <span>{slide.primaryCta.label}</span>
-                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </Link>
+                            {/* Call to Action Buttons */}
+                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2 sm:pt-4">
+                                <Link
+                                    href={slide.primaryCta.href}
+                                    className="group px-6 sm:px-7 py-3 sm:py-3.5 bg-gold text-obsidian font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-gold-light transition-all duration-300 shadow-xl shadow-gold/20 flex items-center gap-2"
+                                >
+                                    <span>{slide.primaryCta.label}</span>
+                                    <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+                                </Link>
 
-                            <Link
-                                href={slide.secondaryCta.href}
-                                className="w-full sm:w-auto px-7 py-3.5 bg-white/10 backdrop-blur-md border border-white/20 text-sand hover:border-gold hover:text-gold font-medium text-xs uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center justify-center"
-                            >
-                                <span>{slide.secondaryCta.label}</span>
-                            </Link>
-                        </div>
-                    </motion.div>
-                </AnimatePresence>
+                                <Link
+                                    href={slide.secondaryCta.href}
+                                    className="px-6 sm:px-7 py-3 sm:py-3.5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-sand hover:border-gold hover:text-gold font-medium text-xs uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center"
+                                >
+                                    <span>{slide.secondaryCta.label}</span>
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
             </div>
 
-            {/* Carousel Navigation Arrows (Left & Right) */}
-            <button
-                onClick={prevSlide}
-                aria-label="Previous Slide"
-                className="absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3.5 rounded-full bg-black/50 hover:bg-gold hover:text-obsidian text-white/80 border border-white/10 hover:border-gold backdrop-blur-md transition-all duration-300 group shadow-xl"
-            >
-                <ChevronLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-            </button>
-            <button
-                onClick={nextSlide}
-                aria-label="Next Slide"
-                className="absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3.5 rounded-full bg-black/50 hover:bg-gold hover:text-obsidian text-white/80 border border-white/10 hover:border-gold backdrop-blur-md transition-all duration-300 group shadow-xl"
-            >
-                <ChevronRight size={20} className="group-hover:translate-x-0.5 transition-transform" />
-            </button>
+            {/* Bottom Controls Bar (Pagination Dots + Left/Right Arrows) */}
+            <div className="absolute bottom-6 sm:bottom-10 left-5 sm:left-8 lg:left-12 z-30 flex items-center gap-4 sm:gap-6">
+                {/* Carousel Indicators / Dot Pagination */}
+                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 px-3.5 py-1.5 rounded-full">
+                    {SLIDES.map((s, idx) => (
+                        <button
+                            key={s.id}
+                            onClick={() => setCurrentSlide(idx)}
+                            aria-label={`Go to slide ${idx + 1}`}
+                            className={`transition-all duration-300 rounded-full ${
+                                currentSlide === idx
+                                    ? "w-7 h-2 bg-gold shadow-md shadow-gold/40"
+                                    : "w-2 h-2 bg-white/30 hover:bg-white/60"
+                            }`}
+                        />
+                    ))}
+                </div>
 
-            {/* Carousel Indicators / Dot Pagination */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 sm:gap-3 bg-black/50 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full">
-                {SLIDES.map((s, idx) => (
+                {/* Left & Right Arrow Buttons */}
+                <div className="flex items-center gap-2">
                     <button
-                        key={s.id}
-                        onClick={() => setCurrentSlide(idx)}
-                        aria-label={`Go to slide ${idx + 1}`}
-                        className={`transition-all duration-300 rounded-full ${
-                            currentSlide === idx
-                                ? "w-8 h-2 bg-gold shadow-md shadow-gold/40"
-                                : "w-2 h-2 bg-white/30 hover:bg-white/60"
-                        }`}
-                    />
-                ))}
+                        onClick={prevSlide}
+                        aria-label="Previous Slide"
+                        className="p-2 sm:p-2.5 rounded-full bg-black/60 hover:bg-gold hover:text-obsidian text-white/80 border border-white/10 hover:border-gold backdrop-blur-md transition-all duration-300 group shadow-lg"
+                    >
+                        <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                    </button>
+                    <button
+                        onClick={nextSlide}
+                        aria-label="Next Slide"
+                        className="p-2 sm:p-2.5 rounded-full bg-black/60 hover:bg-gold hover:text-obsidian text-white/80 border border-white/10 hover:border-gold backdrop-blur-md transition-all duration-300 group shadow-lg"
+                    >
+                        <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                </div>
             </div>
         </section>
     );
