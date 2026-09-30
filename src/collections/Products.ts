@@ -209,24 +209,24 @@ export const Products: CollectionConfig = {
       name: 'imageMedia',
       type: 'upload',
       relationTo: 'media',
-      label: 'Primary Display Image',
+      label: 'Primary Display Media (Image or Video)',
       admin: {
-        description: 'Main product image shown on the shop listing and product page.',
+        description: 'Main product image or showcase video shown on shop listings and product spotlight.',
       },
     },
     {
       name: 'gallery',
       type: 'array',
-      label: 'Additional Gallery Images',
+      label: 'Additional Gallery Media (Images & Videos)',
       admin: {
-        description: 'Upload extra product photos. Video upload will be added soon.',
+        description: 'Upload extra product photos or video clips.',
       },
       fields: [
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Gallery Image',
+          label: 'Media File (Image or Video)',
         },
         {
           name: 'caption',

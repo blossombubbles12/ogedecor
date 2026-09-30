@@ -109,21 +109,26 @@ export async function getProjects() {
 
             // Featured image upload (DB column: featured_image_id)
             const fi = resolveUpload(doc.featuredImage);
-            if (fi) mediaItems.push({ url: fi.url, type: "image" });
+            if (fi) {
+                const isVid = isVideoUrl(fi.url, fi.mimeType);
+                mediaItems.push({ url: fi.url, type: isVid ? "video" : "image" });
+            }
 
             // Gallery array (DB columns: image_id, url, type)
             if (Array.isArray(doc.media)) {
                 for (const m of doc.media) {
                     const img = resolveUpload(m.image);
                     if (img && !mediaItems.find(i => i.url === img.url)) {
-                        const t: "image" | "video" = m.type === "video" ? "video" : "image";
+                        const isVid = m.type === "video" || isVideoUrl(img.url, img.mimeType);
+                        const t: "image" | "video" = isVid ? "video" : "image";
                         mediaItems.push({ url: img.url, type: t });
                         continue;
                     }
                     if (typeof m.url === "string" && m.url.trim()) {
                         const u = m.url.trim();
                         if (!mediaItems.find(i => i.url === u)) {
-                            const t: "image" | "video" = m.type === "video" ? "video" : "image";
+                            const isVid = m.type === "video" || isVideoUrl(u);
+                            const t: "image" | "video" = isVid ? "video" : "image";
                             mediaItems.push({ url: u, type: t });
                         }
                     }
@@ -157,20 +162,25 @@ export async function getProjectById(id: string) {
         const mediaItems: { url: string; type: "image" | "video" }[] = [];
 
         const fi = resolveUpload(doc.featuredImage);
-        if (fi) mediaItems.push({ url: fi.url, type: "image" });
+        if (fi) {
+            const isVid = isVideoUrl(fi.url, fi.mimeType);
+            mediaItems.push({ url: fi.url, type: isVid ? "video" : "image" });
+        }
 
         if (Array.isArray(doc.media)) {
             for (const m of doc.media) {
                 const img = resolveUpload(m.image);
                 if (img && !mediaItems.find(i => i.url === img.url)) {
-                    const t: "image" | "video" = m.type === "video" ? "video" : "image";
+                    const isVid = m.type === "video" || isVideoUrl(img.url, img.mimeType);
+                    const t: "image" | "video" = isVid ? "video" : "image";
                     mediaItems.push({ url: img.url, type: t });
                     continue;
                 }
                 if (typeof m.url === "string" && m.url.trim()) {
                     const u = m.url.trim();
                     if (!mediaItems.find(i => i.url === u)) {
-                        const t: "image" | "video" = m.type === "video" ? "video" : "image";
+                        const isVid = m.type === "video" || isVideoUrl(u);
+                        const t: "image" | "video" = isVid ? "video" : "image";
                         mediaItems.push({ url: u, type: t });
                     }
                 }
@@ -280,18 +290,20 @@ export async function getShopProducts() {
             // Primary image: imageMedia upload (DB: image_media_id) OR legacy image text URL
             const primaryImageUpload = resolveUpload(doc.imageMedia);
             const primaryImage = primaryImageUpload?.url || (typeof doc.image === "string" ? doc.image.trim() : "");
+            const primaryIsVid = isVideoUrl(primaryImage, primaryImageUpload?.mimeType);
 
             // Gallery: imageMedia already included as primary image
             // gallery array has DB columns: image_id (upload), caption (text)
             const galleryItems: { url: string; type: "image" | "video" }[] = [];
             if (primaryImage) {
-                galleryItems.push({ url: primaryImage, type: "image" });
+                galleryItems.push({ url: primaryImage, type: primaryIsVid ? "video" : "image" });
             }
             if (Array.isArray(doc.gallery)) {
                 for (const g of doc.gallery) {
                     const img = resolveUpload(g.image);
                     if (img && !galleryItems.find(i => i.url === img.url)) {
-                        galleryItems.push({ url: img.url, type: "image" });
+                        const isVid = isVideoUrl(img.url, img.mimeType);
+                        galleryItems.push({ url: img.url, type: isVid ? "video" : "image" });
                     }
                 }
             }
@@ -355,16 +367,18 @@ export async function getProductBySlug(slugOrId: string) {
 
             const primaryImageUpload = resolveUpload(doc.imageMedia);
             const primaryImage = primaryImageUpload?.url || (typeof doc.image === "string" ? doc.image.trim() : "");
+            const primaryIsVid = isVideoUrl(primaryImage, primaryImageUpload?.mimeType);
 
             // Gallery: primary image + gallery array items (existing DB columns only)
             const galleryItems: { url: string; type: "image" | "video" }[] = [];
-            if (primaryImage) galleryItems.push({ url: primaryImage, type: "image" });
+            if (primaryImage) galleryItems.push({ url: primaryImage, type: primaryIsVid ? "video" : "image" });
 
             if (Array.isArray(doc.gallery)) {
                 for (const g of doc.gallery) {
                     const img = resolveUpload(g.image);
                     if (img && !galleryItems.find(i => i.url === img.url)) {
-                        galleryItems.push({ url: img.url, type: "image" });
+                        const isVid = isVideoUrl(img.url, img.mimeType);
+                        galleryItems.push({ url: img.url, type: isVid ? "video" : "image" });
                     }
                 }
             }

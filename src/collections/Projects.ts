@@ -40,20 +40,21 @@ export const Projects: CollectionConfig = {
       name: 'featuredImage',
       type: 'upload',
       relationTo: 'media',
+      label: 'Featured Media (Image or Video)',
     },
     {
       name: 'media',
       type: 'array',
-      label: 'Project Gallery Media',
+      label: 'Project Gallery Media (Images & Videos)',
       admin: {
-        description: 'Add project photos. Use the Type field to mark videos by URL.',
+        description: 'Upload project photos or videos. External URLs are also supported.',
       },
       fields: [
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Image File',
+          label: 'Media File (Image or Video)',
         },
         {
           name: 'url',
