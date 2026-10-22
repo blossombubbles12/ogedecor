@@ -99,7 +99,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
         setTimeout(() => setAddedToast(false), 3500);
     };
 
-    const handleAcquireNow = () => {
+    const handleBuyNow = () => {
         addToCart(product, quantity);
         openCheckout();
     };
@@ -321,10 +321,10 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                                     <span>Add to Shopping Bag</span>
                                 </button>
                                 <button
-                                    onClick={handleAcquireNow}
+                                    onClick={handleBuyNow}
                                     className="py-4 px-8 bg-gold text-obsidian rounded-xl text-xs uppercase tracking-widest font-bold hover:bg-gold-light transition-all shadow-xl shadow-gold/20"
                                 >
-                                    Acquire Immediately
+                                    Buy Now
                                 </button>
                             </div>
 
